@@ -1225,6 +1225,21 @@
   }
 
   let currentAudio = null;
+  let activeTTSAbortController = null;
+
+  function stopAudioPlayback() {
+    if (activeTTSAbortController) {
+      try { activeTTSAbortController.abort(); } catch (_) {}
+      activeTTSAbortController = null;
+    }
+    if (currentAudio) {
+      try { currentAudio.pause(); } catch (_) {}
+      currentAudio = null;
+    }
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+  }
 
   function getBestVoice() {
     if (!('speechSynthesis' in window)) return null;
@@ -1236,30 +1251,51 @@
   }
 
   async function speakText(text) {
-    if (currentAudio) {
-      try { currentAudio.pause(); } catch (_) {}
-      currentAudio = null;
-    }
-    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    stopAudioPlayback();
+    text = (text || "").trim();
+    if (!text) return;
+
+    activeTTSAbortController = new AbortController();
+    const signal = activeTTSAbortController.signal;
+
+    // Split into sentences for ultra-fast audio startup (sub-200ms latency)
+    const sentences = text.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [text];
 
     try {
-      const resp = await fetch("/api/tts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: text })
-      });
-      if (resp.ok) {
-        const blob = await resp.blob();
-        const audioUrl = URL.createObjectURL(blob);
-        currentAudio = new Audio(audioUrl);
-        await currentAudio.play();
-        return;
+      for (let i = 0; i < sentences.length; i++) {
+        if (signal.aborted) break;
+        const sent = sentences[i].trim();
+        if (!sent) continue;
+
+        const resp = await fetch("/api/tts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: sent }),
+          signal: signal
+        });
+
+        if (signal.aborted) break;
+
+        if (resp.ok) {
+          const blob = await resp.blob();
+          if (signal.aborted) break;
+          const audioUrl = URL.createObjectURL(blob);
+          currentAudio = new Audio(audioUrl);
+          
+          await new Promise((resolve) => {
+            currentAudio.onended = resolve;
+            currentAudio.onerror = resolve;
+            currentAudio.play().catch(resolve);
+          });
+        }
       }
+      return;
     } catch (err) {
-      console.warn("Rime TTS API call error, falling back to Web Speech:", err);
+      if (err.name === "AbortError") return;
+      console.warn("Rime TTS error, falling back to Web Speech:", err);
     }
 
-    if (!('speechSynthesis' in window)) return;
+    if (!('speechSynthesis' in window) || signal.aborted) return;
     const utter = new SpeechSynthesisUtterance(text);
     utter.rate = 1.0;
     const voice = getBestVoice();
@@ -1271,9 +1307,25 @@
     window.speechSynthesis.onvoiceschanged = () => { getBestVoice(); };
   }
 
+  function closeCallModal() {
+    callOverlay.classList.remove("active");
+    stopAudioPlayback();
+    if (room) {
+      if (room.disconnect) room.disconnect();
+      room = null;
+    }
+    if (recognition) {
+      try { recognition.stop(); } catch(_) {}
+      recognition = null;
+    }
+    talking = false;
+    document.body.classList.remove("rec");
+  }
+
   async function sendUserMessage(text) {
     text = (text || "").trim();
     if (!text) return;
+    stopAudioPlayback();
     addBubble("user", text);
     textInput.value = "";
     chatHistory.push({ role: "user", content: text });
@@ -1312,7 +1364,8 @@
   micBtn.addEventListener("click", () => {
     if (!room) return;
     if (!talking) {
-      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      // Instantly cut off assistant voice when user taps mic
+      stopAudioPlayback();
       mockTranscript = "";
       talking = true;
       document.body.classList.add("rec");

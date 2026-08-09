@@ -2,7 +2,8 @@ import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import handler from "./api/token.js";
+import tokenHandler from "./api/token.js";
+import chatHandler from "./api/chat.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -27,6 +28,7 @@ function loadEnv(envPath) {
 }
 
 loadEnv(path.join(__dirname, ".env"));
+loadEnv(path.join(__dirname, "agent", ".env"));
 
 const PORT = process.env.PORT || 3000;
 const PUBLIC_DIR = path.join(__dirname, "public");
@@ -46,7 +48,7 @@ const MIME_TYPES = {
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
 
-  if (url.pathname === "/api/token") {
+  if (url.pathname === "/api/token" || url.pathname === "/api/chat") {
     let body = "";
     req.on("data", chunk => { body += chunk; });
     req.on("end", () => {
@@ -63,7 +65,9 @@ const server = http.createServer((req, res) => {
         res.setHeader("Content-Type", "application/json");
         res.end(JSON.stringify(data));
       };
-      handler(req, res).catch(err => {
+      
+      const activeHandler = url.pathname === "/api/chat" ? chatHandler : tokenHandler;
+      activeHandler(req, res).catch(err => {
         console.error("API handler error:", err);
         if (!res.writableEnded) {
           res.statusCode = 500;
@@ -95,5 +99,7 @@ const server = http.createServer((req, res) => {
 server.listen(PORT, () => {
   console.log(`\n🚀 Server running at http://localhost:${PORT}`);
   console.log(`- Serving static frontend from: ./public`);
-  console.log(`- Token API endpoint active at: http://localhost:${PORT}/api/token\n`);
+  console.log(`- Token API endpoint active at: http://localhost:${PORT}/api/token`);
+  console.log(`- Groq LLM Chat API endpoint active at: http://localhost:${PORT}/api/chat\n`);
 });
+

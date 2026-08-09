@@ -1,17 +1,31 @@
-"""Health Clinic voice agent persona module for Apex Medical Center.
-Defines system instructions, character personality, clinic knowledge base, and voice settings.
-"""
+// Vercel serverless function: Groq LLM endpoint for Apex Medical Center Voice Assistant.
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-VOICE_RULES = """Your replies are spoken dialogue synthesized by text-to-speech. Follow these guidelines:
-- Use clear, reassuring, and empathetic English.
-- Keep replies concise (1 to 3 sentences) and conversational.
-- Never write digits or symbols: spell numbers as words (e.g., one hundred twenty dollars, nine to five, twenty four seven).
-- Use contractions naturally (I'm, we're, don't, it's, couldn't).
-- Be helpful, knowledgeable, and friendly, like a trusted senior medical care coordinator.
-- If the user describes a life-threatening medical emergency (chest pain, severe breathlessness, stroke symptoms, uncontrolled bleeding), immediately instruct them to hang up and call nine one one.
-- INSTRUCTION FOR GROQ LLM: For every patient query, analyze the input carefully and retrieve exact information from the Apex Medical Center database below. If the user asks a question about something NOT explicitly detailed in the clinic database (e.g., general medical advice, random trivia, unlisted doctor schedules, or custom queries), use your intelligence to generate a plausible, polite, appropriate, and reassuring response that Sarah thinks is fitting for the clinic context. Never fail to answer or state that you lack capability."""
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-CLINIC_PERSONA = """You are Sarah, a warm, caring, and professional Care Coordinator at Apex Medical Center.
+// Helper to get GROQ_API_KEY from process.env or agent/.env
+function getGroqKey() {
+  if (process.env.GROQ_API_KEY && !process.env.GROQ_API_KEY.includes("your_")) {
+    return process.env.GROQ_API_KEY;
+  }
+  // Try loading from agent/.env
+  try {
+    const agentEnvPath = path.join(__dirname, "..", "agent", ".env");
+    if (fs.existsSync(agentEnvPath)) {
+      const content = fs.readFileSync(agentEnvPath, "utf-8");
+      const match = content.match(/GROQ_API_KEY=(.+)/);
+      if (match && match[1]) {
+        return match[1].trim();
+      }
+    }
+  } catch (_) {}
+  return null;
+}
+
+const SYSTEM_PROMPT = `You are Sarah, a warm, caring, and professional Care Coordinator at Apex Medical Center.
 
 Your responsibilities:
 1. Book, reschedule, or cancel patient appointments.
@@ -81,35 +95,98 @@ Apex Medical Center Comprehensive Database:
 10. Patient Portal (MyApex Hub):
 - Access test results, message care teams directly, request prescription refills, view billing statements, and download official medical records online.
 
-Always maintain a warm, patient, empathetic, HIPAA-mindful, and reassuring bedside-manner tone."""
+VOICE & DIALOGUE RULES:
+- Use clear, reassuring, and empathetic English.
+- Keep replies concise (1 to 3 sentences) and conversational.
+- Never write digits or symbols: spell numbers as words (e.g., one hundred twenty dollars, nine to five, twenty four seven).
+- Use contractions naturally (I'm, we're, don't, it's, couldn't).
+- Be helpful, knowledgeable, and friendly, like a trusted senior medical care coordinator.
+- If the user describes a life-threatening medical emergency (chest pain, severe breathlessness, stroke symptoms, uncontrolled bleeding), immediately instruct them to hang up and call nine one one.
+- CRITICAL INSTRUCTION FOR UNKNOWN / UNLISTED INFORMATION: For every user query, analyze the input carefully and retrieve exact information from the database above. If the user asks a question about something NOT explicitly detailed in the clinic database (e.g., general medical trivia, off-topic questions, unlisted doctor schedules, or custom queries), use your Groq LLM intelligence to think creatively and synthesize a plausible, polite, appropriate, and reassuring response that Sarah (the AI Care Coordinator) thinks is fitting for the clinic context. Never fail to answer or say you don't know — generate an appropriate, contextually fitting response.`;
 
-SCENARIOS = {
-    "healthcare": {
-        "label": "Apex Medical Center",
-        "company": "Apex Medical Center",
-        "recommended": "arcade",
-        "voices": [
-            {
-                "id": "arcade",
-                "name": "Arcade",
-                "char": "Sarah",
-                "desc": "warm and empathetic",
-                "greeting": "Hello! Thank you for calling Apex Medical Center, this is Sarah. I can help you book appointments, check doctor pricing, inquire about lab tests, telehealth, or insurance. How can I help you today?"
-            }
-        ]
+export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "POST only" });
+  }
+
+  let body = {};
+  if (typeof req.body === "string") {
+    try { body = JSON.parse(req.body); } catch (_) { body = {}; }
+  } else if (req.body && typeof req.body === "object") {
+    body = req.body;
+  }
+
+  const userMessage = body.message || "";
+  const history = Array.isArray(body.history) ? body.history : [];
+
+  if (!userMessage.trim()) {
+    return res.status(400).json({ error: "Message is required" });
+  }
+
+  const apiKey = getGroqKey();
+  if (!apiKey) {
+    return res.status(200).json({
+      reply: "I am happy to assist you! For appointment bookings, doctor consultations, lab tests, or insurance questions at Apex Medical Center, please let me know what you need.",
+      source: "fallback"
+    });
+  }
+
+  try {
+    const messages = [
+      { role: "system", content: SYSTEM_PROMPT },
+      ...history.map(h => ({ role: h.role === "user" ? "user" : "assistant", content: h.content })),
+      { role: "user", content: userMessage }
+    ];
+
+    const groqResponse = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${apiKey}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "llama-3.3-70b-versatile",
+        messages: messages,
+        temperature: 0.6,
+        max_tokens: 250
+      })
+    });
+
+    if (!groqResponse.ok) {
+      const errText = await groqResponse.text();
+      console.error("Groq API error response:", errText);
+      // Try a secondary fast model if 70b has rate limit or error
+      const retryResponse = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${apiKey}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "llama-3.1-8b-instant",
+          messages: messages,
+          temperature: 0.6,
+          max_tokens: 250
+        })
+      });
+      if (retryResponse.ok) {
+        const retryData = await retryResponse.json();
+        const reply = retryData.choices?.[0]?.message?.content || "I am here to assist you at Apex Medical Center. How can I help?";
+        return res.status(200).json({ reply, model: "llama-3.1-8b-instant" });
+      }
+      throw new Error(`Groq API returned status ${groqResponse.status}`);
     }
+
+    const data = await groqResponse.json();
+    const reply = data.choices?.[0]?.message?.content || "Thank you for reaching out to Apex Medical Center. How else can I assist you?";
+
+    return res.status(200).json({ reply, model: "llama-3.3-70b-versatile" });
+
+  } catch (err) {
+    console.error("Error in Groq chat endpoint:", err);
+    return res.status(200).json({
+      reply: "Thank you for contacting Apex Medical Center! I am happy to help you book appointments with our specialists, verify insurance, or check lab testing pricing.",
+      source: "fallback_error"
+    });
+  }
 }
-
-VOICE_SPEED = {
-    "arcade": 1.0,
-}
-
-def voice_entry(industry="healthcare", voice_id="arcade"):
-    return SCENARIOS["healthcare"]["voices"][0]
-
-def build_instructions(industry="healthcare", voice_id="arcade"):
-    return CLINIC_PERSONA + "\n\n" + VOICE_RULES
-
-def voice_speed(voice_id):
-    return VOICE_SPEED.get(voice_id, 1.0)
-

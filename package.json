@@ -1,0 +1,14 @@
+{
+  "name": "rime-ai4-booth",
+  "version": "2.0.0",
+  "description": "AI4 booth frontend + token function for the Rime LiveKit voice agent (Vercel)",
+  "type": "module",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "vercel-dev": "vercel dev"
+  },
+  "dependencies": {
+    "livekit-server-sdk": "^2.9.0"
+  }
+}

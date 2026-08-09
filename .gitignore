@@ -1,0 +1,13 @@
+.env
+node_modules
+.DS_Store
+*.log
+
+# Python agent
+agent/.env
+agent/.venv
+agent/__pycache__
+**/__pycache__
+*.pyc
+.vercel
+.env*

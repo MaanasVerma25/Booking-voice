@@ -1,8 +1,7 @@
 // Vercel serverless function: mint a visitor join token and declare the
-// booth-agent dispatch with the chosen {industry, voice} as metadata.
+// booth-agent dispatch for Apex Medical Center.
 import { AccessToken, RoomConfiguration, RoomAgentDispatch } from "livekit-server-sdk";
 
-const INDUSTRIES = new Set(["healthcare", "finance", "food", "retail"]);
 const rand = () => Math.random().toString(36).slice(2, 8);
 
 export default async function handler(req, res) {
@@ -14,26 +13,27 @@ export default async function handler(req, res) {
   } else if (req.body && typeof req.body === "object") {
     body = req.body;
   }
-  const industry = INDUSTRIES.has(body.industry) ? body.industry : "healthcare";
-  const voice = typeof body.voice === "string" ? body.voice : undefined;
+
   const name = typeof body.name === "string" ? body.name.slice(0, 40) : undefined;
+  const industry = "healthcare";
+  const voice = "arcade";
 
   const { LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET } = process.env;
   if (!LIVEKIT_URL || !LIVEKIT_API_KEY || !LIVEKIT_API_SECRET || LIVEKIT_URL.includes("your-project") || LIVEKIT_API_KEY.includes("your_livekit")) {
     return res.status(200).json({
       mock: true,
-      industry,
-      voice,
+      industry: "healthcare",
+      voice: "arcade",
       name,
       message: "LiveKit credentials not configured. Running in Mock Demo Mode."
     });
   }
 
-  const room = `booth-${industry}-${rand()}`;
-  const identity = `visitor-${rand()}`;
+  const room = `clinic-${rand()}`;
+  const identity = `patient-${rand()}`;
   const metadata = JSON.stringify({ industry, voice, name });
 
-  const at = new AccessToken(LIVEKIT_API_KEY, LIVEKIT_API_SECRET, { identity, name: name || "Visitor" });
+  const at = new AccessToken(LIVEKIT_API_KEY, LIVEKIT_API_SECRET, { identity, name: name || "Patient" });
   at.addGrant({ roomJoin: true, room, canPublish: true, canSubscribe: true });
   at.roomConfig = new RoomConfiguration({
     agents: [new RoomAgentDispatch({ agentName: "booth-agent", metadata })],

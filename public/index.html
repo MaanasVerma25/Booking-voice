@@ -3,63 +3,122 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Apex Medical Center | Voice Booking & Care Concierge</title>
-<meta name="description" content="Book appointments, check doctor schedules, and ask queries with Sarah, your AI Voice Care Assistant at Apex Medical Center." />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<title>Apex Medical Center — Voice Care Concierge</title>
+<meta name="description" content="Schedule appointments, check doctor availability, and inquire about medical services with Sarah, your AI Voice Care Coordinator at Apex Medical Center." />
 <style>
   :root {
-    --bg-dark: #090E17;
-    --bg-card: rgba(17, 26, 42, 0.75);
-    --bg-card-hover: rgba(26, 39, 62, 0.85);
-    --border-color: rgba(0, 210, 184, 0.18);
-    --border-glow: rgba(0, 210, 184, 0.4);
+    /* Apple Design Tokens */
+    --bg-white: #ffffff;
+    --bg-alt: #f5f5f7;
+    --bg-card: #ffffff;
+    --bg-card-hover: #ffffff;
     
-    --primary: #00D2B8;
-    --primary-hover: #00B8A2;
-    --primary-soft: rgba(0, 210, 184, 0.12);
-    --accent-blue: #0088FF;
-    --accent-glow: rgba(0, 136, 255, 0.25);
+    --text-primary: #1d1d1f;
+    --text-secondary: #86868b;
+    --text-tertiary: #6e6e73;
     
-    --text-main: #F1F5F9;
-    --text-muted: #94A3B8;
-    --text-dim: #64748B;
+    --accent-blue: #0066cc;
+    --accent-blue-hover: #0055b3;
+    --accent-blue-soft: rgba(0, 102, 204, 0.08);
+    --accent-green: #34c759;
+    --accent-red: #ff3b30;
     
-    --danger: #FF4D4D;
-    --success: #10B981;
-    --radius-lg: 20px;
-    --radius-md: 12px;
-    --radius-sm: 8px;
-    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --border-subtle: rgba(0, 0, 0, 0.08);
+    --border-card: #d2d2d7;
+    --border-light: #e5e5ea;
+    
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.08);
+    --shadow-modal: 0 24px 80px rgba(0, 0, 0, 0.2);
+    
+    --radius-pill: 980px;
+    --radius-card: 22px;
+    --radius-modal: 28px;
+    --radius-sm: 12px;
+    
+    --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
   body {
-    font-family: 'Inter', sans-serif;
-    background-color: var(--bg-dark);
-    color: var(--text-main);
-    line-height: 1.6;
+    font-family: var(--font-stack);
+    background-color: var(--bg-white);
+    color: var(--text-primary);
+    line-height: 1.47059;
+    letter-spacing: -0.022em;
     overflow-x: hidden;
     min-height: 100vh;
-    background-image: 
-      radial-gradient(circle at 15% 15%, rgba(0, 210, 184, 0.08) 0%, transparent 40%),
-      radial-gradient(circle at 85% 65%, rgba(0, 136, 255, 0.08) 0%, transparent 45%);
   }
 
-  h1, h2, h3, h4, .font-heading {
-    font-family: 'Outfit', sans-serif;
+  /* Typography Scale */
+  h1 {
+    font-size: clamp(2.8rem, 5vw, 4.2rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    color: var(--text-primary);
   }
 
-  /* Header Navbar */
+  h2 {
+    font-size: clamp(2rem, 3.5vw, 2.75rem);
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+    color: var(--text-primary);
+  }
+
+  h3 {
+    font-size: 1.35rem;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    color: var(--text-primary);
+  }
+
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-secondary);
+  }
+
+  .subhead {
+    font-size: 1.25rem;
+    font-weight: 400;
+    color: var(--text-secondary);
+    line-height: 1.45;
+  }
+
+  /* Navigation Bar */
   header {
     position: sticky;
     top: 0;
     z-index: 100;
+    background: rgba(255, 255, 255, 0.82);
     backdrop-filter: blur(20px);
-    background: rgba(9, 14, 23, 0.85);
-    border-bottom: 1px solid var(--border-color);
-    padding: 16px 5%;
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 0 5%;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: var(--transition);
+  }
+
+  .nav-container {
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -68,266 +127,238 @@
   .logo {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     text-decoration: none;
-    color: var(--text-main);
-    font-weight: 700;
-    font-size: 1.35rem;
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 1.1rem;
+    letter-spacing: -0.02em;
   }
 
   .logo-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, var(--primary), var(--accent-blue));
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: var(--text-primary);
+    color: #ffffff;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 0 15px rgba(0, 210, 184, 0.4);
   }
 
-  .logo-icon svg { width: 24px; height: 24px; fill: none; stroke: #090E17; stroke-width: 2.5; }
+  .logo-icon svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.2; }
 
   nav { display: flex; align-items: center; gap: 32px; }
   nav a {
-    color: var(--text-muted);
+    color: var(--text-secondary);
     text-decoration: none;
-    font-size: 0.95rem;
-    font-weight: 500;
-    transition: var(--transition);
+    font-size: 0.88rem;
+    font-weight: 400;
+    transition: color 0.15s ease;
   }
-  nav a:hover { color: var(--primary); }
+  nav a:hover { color: var(--accent-blue); }
 
   .header-cta {
-    background: linear-gradient(135deg, var(--primary), #00A896);
-    color: #090E17;
-    font-weight: 700;
-    padding: 10px 22px;
-    border-radius: 30px;
+    background: var(--accent-blue);
+    color: #ffffff;
+    font-weight: 500;
+    padding: 7px 16px;
+    border-radius: var(--radius-pill);
     border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 0.92rem;
-    box-shadow: 0 0 20px rgba(0, 210, 184, 0.35);
+    gap: 6px;
+    font-size: 0.85rem;
+    box-shadow: 0 2px 6px rgba(0, 102, 204, 0.2);
     transition: var(--transition);
   }
   .header-cta:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0 28px rgba(0, 210, 184, 0.5);
+    background: var(--accent-blue-hover);
+    transform: scale(1.02);
   }
 
   /* Hero Section */
-  .hero {
-    padding: 90px 5% 70px;
-    max-width: 1280px;
+  .hero-section {
+    background: var(--bg-white);
+    padding: 100px 5% 80px;
+  }
+
+  .hero-container {
+    max-width: 1200px;
     margin: 0 auto;
     display: grid;
-    grid-template-columns: 1.2fr 0.8fr;
-    gap: 60px;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 64px;
     align-items: center;
   }
 
-  .hero-badge {
+  .status-pill {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: var(--primary-soft);
-    border: 1px solid var(--border-color);
-    padding: 6px 16px;
-    border-radius: 20px;
-    color: var(--primary);
-    font-size: 0.88rem;
-    font-weight: 600;
+    background: var(--bg-alt);
+    border: 1px solid var(--border-light);
+    padding: 6px 14px;
+    border-radius: var(--radius-pill);
+    color: var(--text-primary);
+    font-size: 0.82rem;
+    font-weight: 500;
     margin-bottom: 24px;
   }
 
-  .hero-badge span {
-    width: 8px;
-    height: 8px;
+  .status-dot {
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
-    background: var(--primary);
-    box-shadow: 0 0 10px var(--primary);
-  }
-
-  .hero h1 {
-    font-size: 3.4rem;
-    font-weight: 800;
-    line-height: 1.15;
-    margin-bottom: 20px;
-    background: linear-gradient(135deg, #FFFFFF 30%, var(--text-muted));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  .hero h1 span {
-    background: linear-gradient(135deg, var(--primary), var(--accent-blue));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  .hero p {
-    font-size: 1.15rem;
-    color: var(--text-muted);
-    margin-bottom: 36px;
-    max-width: 580px;
+    background: var(--accent-green);
   }
 
   .hero-actions {
     display: flex;
     align-items: center;
-    gap: 18px;
+    gap: 16px;
+    margin-top: 36px;
     flex-wrap: wrap;
   }
 
   .btn-primary {
-    background: linear-gradient(135deg, var(--primary), var(--accent-blue));
-    color: #090E17;
-    font-weight: 700;
-    font-size: 1.05rem;
-    padding: 16px 36px;
-    border-radius: 35px;
+    background: var(--accent-blue);
+    color: #ffffff;
+    font-weight: 500;
+    font-size: 1rem;
+    padding: 14px 28px;
+    border-radius: var(--radius-pill);
     border: none;
     cursor: pointer;
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 10px;
-    box-shadow: 0 0 30px rgba(0, 210, 184, 0.4);
+    gap: 8px;
+    box-shadow: 0 4px 14px rgba(0, 102, 204, 0.25);
     transition: var(--transition);
+    text-decoration: none;
   }
   .btn-primary:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 0 40px rgba(0, 210, 184, 0.6);
+    background: var(--accent-blue-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(0, 102, 204, 0.35);
   }
 
   .btn-secondary {
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--text-main);
-    font-weight: 600;
+    background: var(--bg-alt);
+    color: var(--text-primary);
+    font-weight: 500;
     font-size: 1rem;
-    padding: 16px 28px;
-    border-radius: 35px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 14px 24px;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--border-light);
     cursor: pointer;
     transition: var(--transition);
+    text-decoration: none;
   }
   .btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: var(--primary);
+    background: #e8e8ed;
+    border-color: var(--border-card);
   }
 
-  /* Assistant Preview Visual Card */
+  /* Assistant Feature Card (Apple Hardware Feature Style) */
   .assistant-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-lg);
-    padding: 32px;
-    backdrop-filter: blur(20px);
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+    background: var(--bg-alt);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-card);
+    padding: 36px;
+    box-shadow: var(--shadow-md);
     position: relative;
     overflow: hidden;
   }
 
-  .assistant-card::before {
-    content: '';
-    position: absolute;
-    top: 0; right: 0;
-    width: 150px; height: 150px;
-    background: radial-gradient(circle, rgba(0, 210, 184, 0.15), transparent 70%);
-    pointer-events: none;
-  }
-
-  .avatar-row {
+  .assistant-card-header {
     display: flex;
     align-items: center;
-    gap: 18px;
-    margin-bottom: 24px;
+    gap: 16px;
+    margin-bottom: 28px;
   }
 
-  .avatar {
-    width: 64px;
-    height: 64px;
+  .assistant-avatar {
+    width: 54px;
+    height: 54px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #1E293B, #0F172A);
-    border: 2px solid var(--primary);
+    background: #e8e8ed;
+    color: var(--accent-blue);
     display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;
-    box-shadow: 0 0 20px rgba(0, 210, 184, 0.3);
+    border: 1px solid var(--border-light);
   }
+  .assistant-avatar svg { width: 26px; height: 26px; stroke: currentColor; fill: none; stroke-width: 2; }
 
-  .avatar svg { width: 32px; height: 32px; fill: var(--primary); }
+  .assistant-meta h3 { font-size: 1.25rem; font-weight: 600; }
+  .assistant-meta p { font-size: 0.88rem; color: var(--text-secondary); }
 
-  .avatar-status {
-    position: absolute;
-    bottom: 2px;
-    right: 2px;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: var(--success);
-    border: 2px solid #090E17;
-  }
-
-  .assistant-info h3 { font-size: 1.3rem; font-weight: 700; }
-  .assistant-info p { font-size: 0.88rem; color: var(--text-muted); }
-
-  .card-bullet-list {
+  .feature-list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    margin-top: 20px;
+    gap: 16px;
   }
 
-  .bullet-item {
+  .feature-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    font-size: 0.92rem;
+    color: var(--text-primary);
+  }
+  .feature-item:first-child { border-top: none; padding-top: 0; }
+
+  .feature-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--accent-blue-soft);
+    color: var(--accent-blue);
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-size: 0.92rem;
-    color: var(--text-muted);
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .feature-icon svg { width: 12px; height: 12px; stroke: currentColor; stroke-width: 2.5; fill: none; }
+
+  /* Alternating Section: Doctors & Specialties Grid */
+  .section-alt {
+    background: var(--bg-alt);
+    border-top: 1px solid var(--border-subtle);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 90px 5%;
   }
 
-  .bullet-item svg { width: 18px; height: 18px; color: var(--primary); flex-shrink: 0; }
-
-  /* Specialties & Doctors Section */
   .section-container {
-    max-width: 1280px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 80px 5%;
   }
 
-  .section-title {
+  .section-header {
     text-align: center;
-    margin-bottom: 50px;
+    margin-bottom: 56px;
   }
-
-  .section-title h2 {
-    font-size: 2.5rem;
-    font-weight: 800;
-    margin-bottom: 12px;
-  }
-
-  .section-title p {
-    color: var(--text-muted);
-    font-size: 1.05rem;
-    max-width: 600px;
-    margin: 0 auto;
-  }
+  .section-header .eyebrow { margin-bottom: 10px; }
+  .section-header h2 { margin-bottom: 12px; }
+  .section-header p { max-width: 580px; margin: 0 auto; }
 
   .doctors-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
-    gap: 28px;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px;
   }
 
   .doctor-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-lg);
-    padding: 28px;
-    backdrop-filter: blur(12px);
+    background: var(--bg-white);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-card);
+    padding: 30px;
+    box-shadow: var(--shadow-sm);
     transition: var(--transition);
     display: flex;
     flex-direction: column;
@@ -335,77 +366,129 @@
   }
 
   .doctor-card:hover {
-    transform: translateY(-5px);
-    border-color: var(--border-glow);
-    box-shadow: 0 15px 35px rgba(0, 210, 184, 0.12);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: rgba(0, 102, 204, 0.25);
   }
 
-  .doc-dept {
+  .doc-badge {
     display: inline-block;
-    font-size: 0.78rem;
-    font-weight: 700;
+    font-size: 0.72rem;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--primary);
-    background: var(--primary-soft);
-    padding: 4px 12px;
-    border-radius: 12px;
-    margin-bottom: 16px;
+    letter-spacing: 0.06em;
+    color: var(--accent-blue);
+    margin-bottom: 12px;
   }
 
-  .doc-name { font-size: 1.3rem; font-weight: 700; margin-bottom: 6px; }
-  .doc-price { font-size: 1.1rem; font-weight: 600; color: var(--text-main); margin-bottom: 16px; }
-  .doc-price span { font-size: 0.85rem; color: var(--text-muted); font-weight: 400; }
+  .doc-name { font-size: 1.25rem; font-weight: 600; margin-bottom: 4px; color: var(--text-primary); }
+  .doc-price { font-size: 1.05rem; font-weight: 600; color: var(--text-primary); margin-bottom: 14px; }
+  .doc-price span { font-size: 0.85rem; color: var(--text-secondary); font-weight: 400; }
+  .doc-desc { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.45; margin-bottom: 24px; }
 
   .doc-btn {
     width: 100%;
-    background: rgba(0, 210, 184, 0.1);
-    color: var(--primary);
-    border: 1px solid var(--border-color);
-    padding: 12px;
-    border-radius: var(--radius-md);
-    font-weight: 600;
+    background: var(--bg-alt);
+    color: var(--accent-blue);
+    border: 1px solid var(--border-light);
+    padding: 10px;
+    border-radius: var(--radius-pill);
+    font-size: 0.88rem;
+    font-weight: 500;
     cursor: pointer;
     transition: var(--transition);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
   }
 
   .doc-btn:hover {
-    background: var(--primary);
-    color: #090E17;
+    background: var(--accent-blue);
+    color: #ffffff;
+    border-color: var(--accent-blue);
   }
 
-  /* Info Grid Section */
-  .info-grid {
+  /* Standard Light Section: Diagnostics & Services */
+  .section-light {
+    background: var(--bg-white);
+    padding: 90px 5%;
+  }
+
+  .editorial-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 32px;
+  }
+
+  .editorial-card {
+    background: var(--bg-alt);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-card);
+    padding: 36px;
+  }
+
+  .editorial-card h3 { margin-bottom: 16px; }
+
+  .service-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .service-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-light);
+    font-size: 0.92rem;
+  }
+  .service-row:last-child { border-bottom: none; }
+
+  .service-label { color: var(--text-primary); font-weight: 500; }
+  .service-value { color: var(--text-secondary); text-align: right; }
+  .service-value strong { color: var(--text-primary); font-weight: 600; }
+
+  /* Info Section */
+  .info-cards-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 30px;
-    margin-top: 40px;
+    gap: 24px;
+    margin-top: 48px;
   }
 
-  .info-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-lg);
+  .info-card-clean {
+    background: var(--bg-white);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-card);
     padding: 32px;
+    box-shadow: var(--shadow-sm);
   }
 
-  .info-card h3 { font-size: 1.3rem; margin-bottom: 14px; color: var(--primary); }
-  .info-card p { color: var(--text-muted); font-size: 0.95rem; }
+  .info-card-clean h4 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--text-primary);
+  }
+  .info-card-clean p {
+    color: var(--text-secondary);
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
 
-  /* Floating / Modal Call Drawer */
+  /* Interactive Apple-Style Voice Modal */
   .call-overlay {
     position: fixed;
     top: 0; left: 0; width: 100vw; height: 100vh;
-    background: rgba(5, 9, 15, 0.75);
-    backdrop-filter: blur(12px);
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     z-index: 1000;
     opacity: 0;
     pointer-events: none;
-    transition: var(--transition);
+    transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -418,29 +501,29 @@
   }
 
   .call-modal {
-    background: #0D1524;
-    border: 1px solid var(--border-glow);
-    border-radius: 28px;
+    background: var(--bg-white);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: var(--radius-modal);
     width: 100%;
-    max-width: 580px;
-    height: 80vh;
+    max-width: 600px;
+    height: 82vh;
     max-height: 720px;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 25px 60px rgba(0, 210, 184, 0.25);
+    box-shadow: var(--shadow-modal);
     overflow: hidden;
-    transform: scale(0.95);
-    transition: var(--transition);
+    transform: scale(0.96) translateY(10px);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .call-overlay.active .call-modal {
-    transform: scale(1);
+    transform: scale(1) translateY(0);
   }
 
   .call-header {
-    padding: 20px 24px;
-    background: rgba(18, 28, 45, 0.9);
-    border-bottom: 1px solid var(--border-color);
+    padding: 18px 24px;
+    background: rgba(255, 255, 255, 0.9);
+    border-bottom: 1px solid var(--border-light);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -452,26 +535,28 @@
     gap: 12px;
   }
 
-  .call-avatar {
-    width: 44px; height: 44px;
+  .call-avatar-mini {
+    width: 38px; height: 38px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary), var(--accent-blue));
+    background: var(--bg-alt);
+    border: 1px solid var(--border-light);
+    color: var(--accent-blue);
     display: flex; align-items: center; justify-content: center;
   }
-  .call-avatar svg { width: 24px; height: 24px; fill: #090E17; }
+  .call-avatar-mini svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; }
 
   .call-close-btn {
-    background: rgba(255, 255, 255, 0.08);
-    border: none;
-    color: var(--text-muted);
-    width: 36px; height: 36px;
+    background: var(--bg-alt);
+    border: 1px solid var(--border-light);
+    color: var(--text-secondary);
+    width: 32px; height: 32px;
     border-radius: 50%;
     cursor: pointer;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     display: flex; align-items: center; justify-content: center;
     transition: var(--transition);
   }
-  .call-close-btn:hover { background: rgba(255, 255, 255, 0.2); color: var(--text-main); }
+  .call-close-btn:hover { background: #e8e8ed; color: var(--text-primary); }
 
   .transcript-area {
     flex: 1;
@@ -479,76 +564,73 @@
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 14px;
+    background: #fafafa;
   }
 
   .bubble {
-    max-width: 85%;
-    padding: 14px 18px;
+    max-width: 82%;
+    padding: 12px 18px;
     border-radius: 18px;
-    font-size: 0.95rem;
-    line-height: 1.5;
-    animation: fadeIn 0.3s ease;
+    font-size: 0.94rem;
+    line-height: 1.45;
+    animation: bubbleFade 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(8px); }
+  @keyframes bubbleFade {
+    from { opacity: 0; transform: translateY(6px); }
     to { opacity: 1; transform: translateY(0); }
   }
 
   .bubble.agent {
     align-self: flex-start;
-    background: rgba(0, 210, 184, 0.12);
-    border: 1px solid rgba(0, 210, 184, 0.25);
-    color: #E2E8F0;
+    background: #ffffff;
+    border: 1px solid var(--border-light);
+    color: var(--text-primary);
     border-bottom-left-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
   }
 
   .bubble.user {
     align-self: flex-end;
-    background: linear-gradient(135deg, var(--accent-blue), #0066CC);
-    color: #FFFFFF;
+    background: var(--accent-blue);
+    color: #ffffff;
     border-bottom-right-radius: 4px;
   }
 
-  .bubble.error {
-    align-self: center;
-    background: rgba(255, 77, 77, 0.15);
-    border: 1px solid rgba(255, 77, 77, 0.3);
-    color: #FF8080;
-    font-size: 0.85rem;
-  }
-
   .chips-wrapper {
-    padding: 12px 24px;
+    padding: 12px 20px;
     display: flex;
     gap: 8px;
     overflow-x: auto;
+    background: #ffffff;
+    border-top: 1px solid var(--border-subtle);
     scrollbar-width: none;
   }
   .chips-wrapper::-webkit-scrollbar { display: none; }
 
   .chip-btn {
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    color: var(--text-muted);
+    background: var(--bg-alt);
+    border: 1px solid var(--border-light);
+    color: var(--text-primary);
     padding: 6px 14px;
-    border-radius: 20px;
+    border-radius: var(--radius-pill);
     font-size: 0.82rem;
+    font-weight: 400;
     white-space: nowrap;
     cursor: pointer;
     transition: var(--transition);
   }
   .chip-btn:hover {
-    border-color: var(--primary);
-    color: var(--primary);
-    background: var(--primary-soft);
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+    background: var(--accent-blue-soft);
   }
 
   .call-footer {
-    padding: 20px 24px;
-    background: rgba(18, 28, 45, 0.95);
-    border-top: 1px solid var(--border-color);
+    padding: 18px 24px;
+    background: #ffffff;
+    border-top: 1px solid var(--border-light);
     display: flex;
     flex-direction: column;
     gap: 14px;
@@ -559,51 +641,48 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    font-size: 0.85rem;
-    color: var(--text-muted);
+    font-size: 0.84rem;
+    color: var(--text-secondary);
   }
 
-  .status-indicator {
-    width: 8px; height: 8px;
+  .status-indicator-dot {
+    width: 7px; height: 7px;
     border-radius: 50%;
-    background: var(--primary);
-    box-shadow: 0 0 10px var(--primary);
+    background: var(--accent-blue);
   }
 
   .mic-controls {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 16px;
   }
 
   .mic-main-btn {
-    width: 64px; height: 64px;
+    width: 60px; height: 60px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary), var(--accent-blue));
+    background: var(--accent-blue);
     border: none;
-    color: #090E17;
+    color: #ffffff;
     cursor: pointer;
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 0 25px rgba(0, 210, 184, 0.4);
+    box-shadow: 0 4px 16px rgba(0, 102, 204, 0.3);
     transition: var(--transition);
   }
 
   .mic-main-btn:hover {
-    transform: scale(1.06);
-    box-shadow: 0 0 35px rgba(0, 210, 184, 0.6);
+    transform: scale(1.05);
+    background: var(--accent-blue-hover);
   }
 
   body.rec .mic-main-btn {
-    background: var(--danger);
-    color: #FFF;
-    box-shadow: 0 0 30px rgba(255, 77, 77, 0.6);
-    animation: pulseMic 1.2s infinite;
+    background: var(--accent-red);
+    box-shadow: 0 4px 20px rgba(255, 59, 48, 0.4);
+    animation: siriPulse 1.2s infinite ease-in-out;
   }
 
-  @keyframes pulseMic {
+  @keyframes siriPulse {
     0% { transform: scale(1); }
-    50% { transform: scale(1.08); }
+    50% { transform: scale(1.06); }
     100% { transform: scale(1); }
   }
 
@@ -614,306 +693,372 @@
 
   .text-input {
     flex: 1;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 25px;
+    background: var(--bg-alt);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-pill);
     padding: 10px 18px;
-    color: var(--text-main);
+    color: var(--text-primary);
     font-size: 0.9rem;
     outline: none;
+    font-family: var(--font-stack);
   }
-  .text-input:focus { border-color: var(--primary); }
+  .text-input:focus { border-color: var(--accent-blue); background: #ffffff; }
 
   .send-btn {
-    background: var(--primary);
-    color: #090E17;
+    background: var(--accent-blue);
+    color: #ffffff;
     border: none;
     padding: 10px 20px;
-    border-radius: 25px;
-    font-weight: 600;
+    border-radius: var(--radius-pill);
+    font-weight: 500;
+    font-size: 0.88rem;
     cursor: pointer;
+    transition: var(--transition);
   }
+  .send-btn:hover { background: var(--accent-blue-hover); }
 
   @media (max-width: 868px) {
-    .hero { grid-template-columns: 1fr; gap: 40px; text-align: center; }
-    .hero p { margin: 0 auto 36px; }
-    .hero-actions { justify-content: center; }
+    .hero-container { grid-template-columns: 1fr; gap: 40px; }
     nav { display: none; }
+    h1 { font-size: 2.8rem; }
+    .hero-section { padding: 60px 5% 50px; }
   }
 </style>
 </head>
 <body>
 
-  <!-- Header Navbar -->
+  <!-- Sticky Apple-Style Navigation Bar -->
   <header>
-    <a href="#" class="logo">
-      <div class="logo-icon">
-        <svg viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M12 5v14"/><path d="M5 12h14"/></svg>
-      </div>
-      <span>Apex Medical</span>
-    </a>
+    <div class="nav-container">
+      <a href="#" class="logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+        </div>
+        <span>Apex Medical</span>
+      </a>
 
-    <nav>
-      <a href="#specialties">Doctors & Pricing</a>
-      <a href="#services">Services</a>
-      <a href="#insurance">Insurance</a>
-    </nav>
+      <nav>
+        <a href="#specialties">Specialists</a>
+        <a href="#services">Diagnostics & Labs</a>
+        <a href="#info">Clinic Information</a>
+      </nav>
 
-    <button class="header-cta" id="headerCallBtn">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-      Call Care Assistant
-    </button>
+      <button class="header-cta" id="headerCallBtn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        Speak with Sarah
+      </button>
+    </div>
   </header>
 
   <!-- Hero Section -->
-  <section class="hero">
-    <div>
-      <div class="hero-badge">
-        <span></span> 24/7 AI Voice Care Assistant Active
+  <section class="hero-section">
+    <div class="hero-container">
+      <div>
+        <div class="status-pill">
+          <span class="status-dot"></span> 24/7 AI Care Assistant Active
+        </div>
+        <h1>Healthcare.<br>Spoken clearly.</h1>
+        <p class="subhead" style="margin-top: 18px;">Experience instant appointment scheduling, specialist inquiries, and diagnostic lab pricing through intuitive voice interaction.</p>
+        
+        <div class="hero-actions">
+          <button class="btn-primary" id="heroCallBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+            Call Sarah Now
+          </button>
+          <a href="#specialties" class="btn-secondary">View Specialists & Fees</a>
+        </div>
       </div>
-      <h1>World-Class Healthcare, <span>One Voice Call Away.</span></h1>
-      <p>Speak directly with Sarah, our AI Voice Care Coordinator, to book appointments, check doctor availability, or inquire about consultation fees and insurance.</p>
-      
-      <div class="hero-actions">
-        <button class="btn-primary" id="heroCallBtn">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
-          Call Sarah Now
-        </button>
-        <a href="#specialties" class="btn-secondary">View Doctors & Fees</a>
+
+      <!-- Assistant Feature Card -->
+      <div class="assistant-card">
+        <div class="assistant-card-header">
+          <div class="assistant-avatar">
+            <svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 0 1 5 5v3a5 5 0 0 1-10 0V7a5 5 0 0 1 5-5z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+          </div>
+          <div class="assistant-meta">
+            <h3>Sarah</h3>
+            <p>AI Care Coordinator</p>
+          </div>
+        </div>
+
+        <div class="feature-list">
+          <div class="feature-item">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <span>Instant appointment booking & rescheduling</span>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <span>Transparent physician consultation fees</span>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <span>Accepted insurance & telehealth verification</span>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <span>Powered by Groq LLM intelligence</span>
+          </div>
+        </div>
       </div>
     </div>
+  </section>
 
-    <!-- Assistant Preview Card -->
-    <div class="assistant-card">
-      <div class="avatar-row">
-        <div class="avatar">
-          <svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 0 1 5 5v3a5 5 0 0 1-10 0V7a5 5 0 0 1 5-5z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
-          <div class="avatar-status"></div>
-        </div>
-        <div class="assistant-info">
-          <h3>Sarah</h3>
-          <p>Voice Care Coordinator</p>
-        </div>
+  <!-- Alternating Warm Grey Section: Specialists & Doctors -->
+  <section class="section-alt" id="specialties">
+    <div class="section-container">
+      <div class="section-header">
+        <div class="eyebrow">Medical Team</div>
+        <h2>Board-Certified Specialists</h2>
+        <p class="subhead">Consult with leading physicians across eight dedicated departments. Call Sarah to check real-time availability.</p>
       </div>
 
-      <div class="card-bullet-list">
-        <div class="bullet-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-          Instant appointment booking & rescheduling
+      <div class="doctors-grid">
+        <!-- Doctor 1 -->
+        <div class="doctor-card">
+          <div>
+            <span class="doc-badge">Family Medicine</span>
+            <h3 class="doc-name">Dr. Robert Vance</h3>
+            <div class="doc-price">$120 <span>/ Consultation</span></div>
+            <p class="doc-desc">Routine checkups, preventive health, and chronic disease management.</p>
+          </div>
+          <button class="doc-btn book-doc-btn" data-doc="Dr. Robert Vance (Family Medicine)">
+            Schedule via Voice <span>→</span>
+          </button>
         </div>
-        <div class="bullet-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-          Transparent consultation fees & pricing
+
+        <!-- Doctor 2 -->
+        <div class="doctor-card">
+          <div>
+            <span class="doc-badge">Cardiology</span>
+            <h3 class="doc-name">Dr. Elena Rostova</h3>
+            <div class="doc-price">$220 <span>/ Consultation</span></div>
+            <p class="doc-desc">Comprehensive cardiovascular assessments, ECG screening, and heart disease care.</p>
+          </div>
+          <button class="doc-btn book-doc-btn" data-doc="Dr. Elena Rostova (Cardiology)">
+            Schedule via Voice <span>→</span>
+          </button>
         </div>
-        <div class="bullet-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-          Accepted insurance verification
+
+        <!-- Doctor 3 -->
+        <div class="doctor-card">
+          <div>
+            <span class="doc-badge">Pediatrics</span>
+            <h3 class="doc-name">Dr. Marcus Chen</h3>
+            <div class="doc-price">$150 <span>/ Consultation</span></div>
+            <p class="doc-desc">Specialized healthcare, immunizations, and developmental checkups for children.</p>
+          </div>
+          <button class="doc-btn book-doc-btn" data-doc="Dr. Marcus Chen (Pediatrics)">
+            Schedule via Voice <span>→</span>
+          </button>
+        </div>
+
+        <!-- Doctor 4 -->
+        <div class="doctor-card">
+          <div>
+            <span class="doc-badge">Dermatology</span>
+            <h3 class="doc-name">Dr. Sophia Alvarez</h3>
+            <div class="doc-price">$180 <span>/ Consultation</span></div>
+            <p class="doc-desc">Skin cancer screenings, acne treatments, eczema, and mole evaluation.</p>
+          </div>
+          <button class="doc-btn book-doc-btn" data-doc="Dr. Sophia Alvarez (Dermatology)">
+            Schedule via Voice <span>→</span>
+          </button>
+        </div>
+
+        <!-- Doctor 5 -->
+        <div class="doctor-card">
+          <div>
+            <span class="doc-badge">Orthopedics & Sports</span>
+            <h3 class="doc-name">Dr. Arthur Pendelton</h3>
+            <div class="doc-price">$210 <span>/ Consultation</span></div>
+            <p class="doc-desc">Joint pain, arthritis, fracture care, and physical therapy referrals.</p>
+          </div>
+          <button class="doc-btn book-doc-btn" data-doc="Dr. Arthur Pendelton (Orthopedics)">
+            Schedule via Voice <span>→</span>
+          </button>
+        </div>
+
+        <!-- Doctor 6 -->
+        <div class="doctor-card">
+          <div>
+            <span class="doc-badge">Neurology & Headaches</span>
+            <h3 class="doc-name">Dr. Maya Lin</h3>
+            <div class="doc-price">$240 <span>/ Consultation</span></div>
+            <p class="doc-desc">Migraine management, nerve assessments, seizure care, and memory evaluation.</p>
+          </div>
+          <button class="doc-btn book-doc-btn" data-doc="Dr. Maya Lin (Neurology)">
+            Schedule via Voice <span>→</span>
+          </button>
+        </div>
+
+        <!-- Doctor 7 -->
+        <div class="doctor-card">
+          <div>
+            <span class="doc-badge">Gastroenterology</span>
+            <h3 class="doc-name">Dr. James Wilson</h3>
+            <div class="doc-price">$200 <span>/ Consultation</span></div>
+            <p class="doc-desc">Acid reflux, IBS care, digestive health, and endoscopy consultations.</p>
+          </div>
+          <button class="doc-btn book-doc-btn" data-doc="Dr. James Wilson (Gastroenterology)">
+            Schedule via Voice <span>→</span>
+          </button>
+        </div>
+
+        <!-- Doctor 8 -->
+        <div class="doctor-card">
+          <div>
+            <span class="doc-badge">ENT & Allergy</span>
+            <h3 class="doc-name">Dr. Rachel Green</h3>
+            <div class="doc-price">$170 <span>/ Consultation</span></div>
+            <p class="doc-desc">Sinus infections, allergy testing, hearing exams, and throat care.</p>
+          </div>
+          <button class="doc-btn book-doc-btn" data-doc="Dr. Rachel Green (ENT & Allergy)">
+            Schedule via Voice <span>→</span>
+          </button>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Doctors & Pricing Section -->
-  <section class="section-container" id="specialties">
-    <div class="section-title">
-      <h2>Board-Certified Specialists & Fees</h2>
-      <p>Consult with top board-certified physicians across 8 medical specialties. Call Sarah to check available time slots.</p>
-    </div>
-
-    <div class="doctors-grid">
-      <!-- Doctor 1 -->
-      <div class="doctor-card">
-        <div>
-          <span class="doc-dept">Family Medicine</span>
-          <h3 class="doc-name">Dr. Robert Vance</h3>
-          <div class="doc-price">$120 <span>/ Consultation</span></div>
-          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">Routine checkups, preventive health, and chronic disease management.</p>
-        </div>
-        <button class="doc-btn book-doc-btn" data-doc="Dr. Robert Vance (Family Medicine)">
-          Book via Voice Call
-        </button>
+  <!-- Editorial Section: Diagnostics & Laboratory Services -->
+  <section class="section-light" id="services">
+    <div class="section-container">
+      <div class="section-header">
+        <div class="eyebrow">Services & Pricing</div>
+        <h2>Diagnostics, Labs & Telehealth</h2>
+        <p class="subhead">Transparent fees for diagnostic imaging, blood work, virtual care, and pharmacy services.</p>
       </div>
 
-      <!-- Doctor 2 -->
-      <div class="doctor-card">
-        <div>
-          <span class="doc-dept">Cardiology</span>
-          <h3 class="doc-name">Dr. Elena Rostova</h3>
-          <div class="doc-price">$220 <span>/ Consultation</span></div>
-          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">Cardiovascular assessments, ECG screening, and heart disease management.</p>
+      <div class="editorial-grid">
+        <div class="editorial-card">
+          <h3>Diagnostic Imaging & Labs</h3>
+          <div class="service-list">
+            <div class="service-row">
+              <span class="service-label">Complete Blood Count (CBC)</span>
+              <span class="service-value"><strong>$45</strong> (24-hr result)</span>
+            </div>
+            <div class="service-row">
+              <span class="service-label">Comprehensive Lipid Panel</span>
+              <span class="service-value"><strong>$60</strong> (24-hr result)</span>
+            </div>
+            <div class="service-row">
+              <span class="service-label">Digital X-Ray Scan</span>
+              <span class="service-value"><strong>$95</strong> (Same-day report)</span>
+            </div>
+            <div class="service-row">
+              <span class="service-label">High-Field MRI Scan</span>
+              <span class="service-value"><strong>$450</strong> (48-hr result)</span>
+            </div>
+            <div class="service-row">
+              <span class="service-label">Ultrasound Imaging</span>
+              <span class="service-value"><strong>$180</strong> (24-hr result)</span>
+            </div>
+            <div class="service-row">
+              <span class="service-label">ECG / EKG Screening</span>
+              <span class="service-value"><strong>$75</strong> (Immediate read)</span>
+            </div>
+          </div>
         </div>
-        <button class="doc-btn book-doc-btn" data-doc="Dr. Elena Rostova (Cardiology)">
-          Book via Voice Call
-        </button>
-      </div>
 
-      <!-- Doctor 3 -->
-      <div class="doctor-card">
-        <div>
-          <span class="doc-dept">Pediatrics</span>
-          <h3 class="doc-name">Dr. Marcus Chen</h3>
-          <div class="doc-price">$150 <span>/ Consultation</span></div>
-          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">Specialized care, vaccinations, and developmental checkups for children.</p>
+        <div class="editorial-card">
+          <h3>Telehealth & Virtual Care</h3>
+          <div class="service-list">
+            <div class="service-row">
+              <span class="service-label">Virtual Video Discount</span>
+              <span class="service-value"><strong>20% Off</strong> standard rates</span>
+            </div>
+            <div class="service-row">
+              <span class="service-label">Family Medicine Virtual</span>
+              <span class="service-value"><strong>$96</strong> (Reg $120)</span>
+            </div>
+            <div class="service-row">
+              <span class="service-label">Prescription Renewals</span>
+              <span class="service-value"><strong>Included</strong></span>
+            </div>
+            <div class="service-row">
+              <span class="service-label">Supported Devices</span>
+              <span class="service-value">iOS, Android, Web</span>
+            </div>
+          </div>
         </div>
-        <button class="doc-btn book-doc-btn" data-doc="Dr. Marcus Chen (Pediatrics)">
-          Book via Voice Call
-        </button>
-      </div>
 
-      <!-- Doctor 4 -->
-      <div class="doctor-card">
-        <div>
-          <span class="doc-dept">Dermatology</span>
-          <h3 class="doc-name">Dr. Sophia Alvarez</h3>
-          <div class="doc-price">$180 <span>/ Consultation</span></div>
-          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">Skin cancer screenings, acne treatments, eczema, and mole evaluation.</p>
+        <div class="editorial-card">
+          <h3>Pharmacy & Immunizations</h3>
+          <div class="service-list">
+            <div class="service-row">
+              <span class="service-label">Seasonal Flu Vaccine</span>
+              <span class="service-value"><strong>$30</strong> (Covered by insurance)</span>
+            </div>
+            <div class="service-row">
+              <span class="service-label">COVID-19 Booster</span>
+              <span class="service-value"><strong>Free</strong></span>
+            </div>
+            <div class="service-row">
+              <span class="service-label">Tdap Booster</span>
+              <span class="service-value"><strong>$45</strong></span>
+            </div>
+            <div class="service-row">
+              <span class="service-label">In-House Pharmacy</span>
+              <span class="service-value">Mon-Fri 8am-6:30pm</span>
+            </div>
+          </div>
         </div>
-        <button class="doc-btn book-doc-btn" data-doc="Dr. Sophia Alvarez (Dermatology)">
-          Book via Voice Call
-        </button>
-      </div>
-
-      <!-- Doctor 5 -->
-      <div class="doctor-card">
-        <div>
-          <span class="doc-dept">Orthopedics & Sports</span>
-          <h3 class="doc-name">Dr. Arthur Pendelton</h3>
-          <div class="doc-price">$210 <span>/ Consultation</span></div>
-          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">Joint pain, arthritis, fracture care, and physical therapy referrals.</p>
-        </div>
-        <button class="doc-btn book-doc-btn" data-doc="Dr. Arthur Pendelton (Orthopedics)">
-          Book via Voice Call
-        </button>
-      </div>
-
-      <!-- Doctor 6 -->
-      <div class="doctor-card">
-        <div>
-          <span class="doc-dept">Neurology & Headaches</span>
-          <h3 class="doc-name">Dr. Maya Lin</h3>
-          <div class="doc-price">$240 <span>/ Consultation</span></div>
-          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">Migraine care, nerve assessments, seizure disorders, and memory evaluation.</p>
-        </div>
-        <button class="doc-btn book-doc-btn" data-doc="Dr. Maya Lin (Neurology)">
-          Book via Voice Call
-        </button>
-      </div>
-
-      <!-- Doctor 7 -->
-      <div class="doctor-card">
-        <div>
-          <span class="doc-dept">Gastroenterology</span>
-          <h3 class="doc-name">Dr. James Wilson</h3>
-          <div class="doc-price">$200 <span>/ Consultation</span></div>
-          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">Acid reflux, IBS care, digestive health, and endoscopy consultations.</p>
-        </div>
-        <button class="doc-btn book-doc-btn" data-doc="Dr. James Wilson (Gastroenterology)">
-          Book via Voice Call
-        </button>
-      </div>
-
-      <!-- Doctor 8 -->
-      <div class="doctor-card">
-        <div>
-          <span class="doc-dept">ENT & Allergy</span>
-          <h3 class="doc-name">Dr. Rachel Green</h3>
-          <div class="doc-price">$170 <span>/ Consultation</span></div>
-          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">Sinus infections, allergy testing, hearing exams, and throat care.</p>
-        </div>
-        <button class="doc-btn book-doc-btn" data-doc="Dr. Rachel Green (ENT & Allergy)">
-          Book via Voice Call
-        </button>
       </div>
     </div>
   </section>
 
-  <!-- Clinic Services, Imaging & Diagnostics Section -->
-  <section class="section-container" id="services" style="padding-top: 20px;">
-    <div class="section-title">
-      <h2>Diagnostics, Lab Tests & Services</h2>
-      <p>Transparent pricing for lab work, imaging scans, virtual care, and in-house pharmacy.</p>
-    </div>
-
-    <div class="info-grid">
-      <div class="info-card">
-        <h3>Diagnostic Imaging & Labs</h3>
-        <p>
-          • Complete Blood Count (CBC): <strong>$45</strong> (24-hr turnaround)<br>
-          • Comprehensive Lipid Panel: <strong>$60</strong> (24-hr turnaround)<br>
-          • Digital X-Ray Scan: <strong>$95</strong> (Same-day digital report)<br>
-          • High-Field MRI Scan: <strong>$450</strong> (48-hr turnaround)<br>
-          • Ultrasound Imaging: <strong>$180</strong> (24-hr turnaround)<br>
-          • Mammogram Screening: <strong>$130</strong><br>
-          • ECG / EKG Heart Test: <strong>$75</strong> (Immediate preliminary read)
-        </p>
+  <!-- Clinic Information Section -->
+  <section class="section-alt" id="info">
+    <div class="section-container">
+      <div class="section-header">
+        <div class="eyebrow">Facility Details</div>
+        <h2>Operating Hours & Policies</h2>
       </div>
 
-      <div class="info-card">
-        <h3>Telehealth & Virtual Care</h3>
-        <p>
-          • 20% discount on all virtual video consultations.<br>
-          • Access from any smartphone, tablet, or laptop.<br>
-          • Ideal for follow-ups, medication renewals, and minor health concerns.<br>
-          • Family Medicine Virtual Consult: <strong>$96</strong> (Reg $120).
-        </p>
-      </div>
+      <div class="info-cards-grid">
+        <div class="info-card-clean">
+          <h4>Clinic & Urgent Care Hours</h4>
+          <p><strong>Regular Hours:</strong> Mon-Fri 8:00 AM – 6:00 PM | Sat 9:00 AM – 2:00 PM<br>
+          <strong>Urgent Care Walk-Ins:</strong> Mon-Fri 8 AM – 8 PM | Sat-Sun 9 AM – 5 PM<br>
+          <strong>Voice AI Coordinator:</strong> Active 24/7</p>
+        </div>
 
-      <div class="info-card">
-        <h3>Pharmacy & Vaccines</h3>
-        <p>
-          • In-House Pharmacy: Mon-Fri 8am-6:30pm, Sat 9am-2:30pm.<br>
-          • Electronic prescription transfers to any pharmacy.<br>
-          • Seasonal Flu Shot: <strong>$30</strong> (100% covered by insurance).<br>
-          • COVID-19 Boosters: <strong>Free</strong>.<br>
-          • Tdap Booster: <strong>$45</strong>.
-        </p>
+        <div class="info-card-clean">
+          <h4>Insurance & Payment</h4>
+          <p><strong>Accepted Insurance:</strong> Blue Cross Blue Shield, Aetna, Cigna, UnitedHealth, Medicare, Humana, Kaiser PPO, TriCare.<br>
+          <strong>Self-Pay Discount:</strong> 15% prompt-pay discount on date of service.<br>
+          <strong>Payment Plans:</strong> Monthly options for balances over $300.</p>
+        </div>
+
+        <div class="info-card-clean">
+          <h4>Location & Parking</h4>
+          <p><strong>Address:</strong> 500 Medical Parkway, Suite A, Health District.<br>
+          <strong>Parking:</strong> Free attached multi-level garage with complimentary valet and wheelchair access.<br>
+          <strong>Cancellation:</strong> 24-hr advance notice required to avoid $30 late fee.</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- Info Cards Section -->
-  <section class="section-container" id="insurance" style="padding-top: 0;">
-    <div class="info-grid">
-      <div class="info-card">
-        <h3>Operating Hours & Urgent Care</h3>
-        <p>
-          <strong>Clinic Hours:</strong> Mon-Fri 8:00 AM - 6:00 PM | Sat 9:00 AM - 2:00 PM<br>
-          <strong>Urgent Care Walk-Ins:</strong> Mon-Fri 8am-8pm | Sat-Sun 9am-5pm<br>
-          <strong>Voice AI Concierge:</strong> Available 24/7
-        </p>
-      </div>
-
-      <div class="info-card">
-        <h3>Insurance & Payment Options</h3>
-        <p>
-          <strong>Insurance:</strong> BCBS, Aetna, Cigna, UnitedHealth, Medicare, Humana, Kaiser PPO, TriCare.<br>
-          <strong>Self-Pay Discount:</strong> 15% discount for prompt payment on day of service.<br>
-          <strong>Payment Plans:</strong> Monthly installments available for balances over $300.
-        </p>
-      </div>
-
-      <div class="info-card">
-        <h3>Location, Parking & Policies</h3>
-        <p>
-          <strong>Address:</strong> 500 Medical Parkway, Suite A.<br>
-          <strong>Parking:</strong> Free multi-level attached garage with valet & wheelchair access.<br>
-          <strong>Cancellation:</strong> 24-hr advance notice required to avoid $30 fee.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Floating Call Modal -->
+  <!-- Interactive Voice Modal (Apple iOS / Siri Design Language) -->
   <div class="call-overlay" id="callOverlay">
     <div class="call-modal">
       <div class="call-header">
         <div class="call-title">
-          <div class="call-avatar">
+          <div class="call-avatar-mini">
             <svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 0 1 5 5v3a5 5 0 0 1-10 0V7a5 5 0 0 1 5-5z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
           </div>
           <div>
-            <h4 style="font-size: 1.1rem;">Sarah — Care Assistant</h4>
-            <span style="font-size: 0.78rem; color: var(--primary);">Apex Medical Voice AI (Groq LLM Powered)</span>
+            <h4 style="font-size: 1.05rem; font-weight: 600;">Sarah</h4>
+            <span style="font-size: 0.76rem; color: var(--accent-blue); font-weight: 500;">Apex Voice Assistant</span>
           </div>
         </div>
         <button class="call-close-btn" id="closeCallBtn">&times;</button>
@@ -937,13 +1082,13 @@
 
       <div class="call-footer">
         <div class="call-status-bar">
-          <div class="status-indicator"></div>
+          <div class="status-indicator-dot"></div>
           <span id="statusText">Tap mic to speak</span>
         </div>
 
         <div class="mic-controls">
           <button class="mic-main-btn" id="micBtn" title="Tap to talk / send">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
           </button>
         </div>
 
@@ -1201,4 +1346,3 @@
 </script>
 </body>
 </html>
-

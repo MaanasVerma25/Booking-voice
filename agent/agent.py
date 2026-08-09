@@ -12,6 +12,7 @@ call by design). The browser frontend creates the room with JSON metadata
 """
 import json
 import logging
+import os
 
 from dotenv import load_dotenv
 from livekit import agents
@@ -73,22 +74,19 @@ async def entrypoint(ctx: JobContext):
 
     industry, voice = _resolve_config(ctx)
     voice_id = voice["id"]
-    logger.info("booth session: industry=%s voice=%s (%s)", industry, voice_id, voice["char"])
+    tts_model = os.getenv("RIME_MODEL", "coda")  # Rime Coda model for spoken output
+    logger.info("booth session: industry=%s voice=%s (%s) tts_model=%s", industry, voice_id, voice["char"], tts_model)
 
     session = AgentSession(
         stt=inference.STT(model="deepgram/nova-3", language="multi"),
         llm=openai.LLM.with_groq(model="llama-3.3-70b-versatile"),
         tts=rime.TTS(
-            model="coda",
+            model=tts_model,
             speaker=voice_id,
-            time_scale_factor=voice_speed(voice_id),  # luna 1.1, vespera 1.05
+            time_scale_factor=voice_speed(voice_id),
         ),
         vad=silero.VAD.load(),
         turn_detection="manual",  # push-to-talk: the visitor drives turn boundaries
-        # Start LLM + TTS on interim transcripts while the visitor is still
-        # talking, so the reply is largely synthesized by the time they tap
-        # send. Cuts seconds of dead air on booth wifi; a discarded
-        # speculation costs only a few LLM tokens.
         preemptive_generation=True,
     )
 

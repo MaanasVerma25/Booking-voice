@@ -4,6 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import tokenHandler from "./api/token.js";
 import chatHandler from "./api/chat.js";
+import ttsHandler from "./api/tts.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -48,7 +49,7 @@ const MIME_TYPES = {
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
 
-  if (url.pathname === "/api/token" || url.pathname === "/api/chat") {
+  if (url.pathname === "/api/token" || url.pathname === "/api/chat" || url.pathname === "/api/tts") {
     let body = "";
     req.on("data", chunk => { body += chunk; });
     req.on("end", () => {
@@ -65,8 +66,14 @@ const server = http.createServer((req, res) => {
         res.setHeader("Content-Type", "application/json");
         res.end(JSON.stringify(data));
       };
+      res.send = function (data) {
+        res.end(data);
+      };
       
-      const activeHandler = url.pathname === "/api/chat" ? chatHandler : tokenHandler;
+      let activeHandler = tokenHandler;
+      if (url.pathname === "/api/chat") activeHandler = chatHandler;
+      if (url.pathname === "/api/tts") activeHandler = ttsHandler;
+
       activeHandler(req, res).catch(err => {
         console.error("API handler error:", err);
         if (!res.writableEnded) {
@@ -100,6 +107,8 @@ server.listen(PORT, () => {
   console.log(`\n🚀 Server running at http://localhost:${PORT}`);
   console.log(`- Serving static frontend from: ./public`);
   console.log(`- Token API endpoint active at: http://localhost:${PORT}/api/token`);
-  console.log(`- Groq LLM Chat API endpoint active at: http://localhost:${PORT}/api/chat\n`);
+  console.log(`- Groq LLM Chat API endpoint active at: http://localhost:${PORT}/api/chat`);
+  console.log(`- Rime Coda TTS API endpoint active at: http://localhost:${PORT}/api/tts\n`);
 });
+
 

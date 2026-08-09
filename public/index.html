@@ -1224,13 +1224,51 @@
     }, 400);
   }
 
-  function speakText(text) {
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      const utter = new SpeechSynthesisUtterance(text);
-      utter.rate = 1.0;
-      window.speechSynthesis.speak(utter);
+  let currentAudio = null;
+
+  function getBestVoice() {
+    if (!('speechSynthesis' in window)) return null;
+    const voices = window.speechSynthesis.getVoices();
+    if (!voices || !voices.length) return null;
+    return voices.find(v => v.name.includes("Google US English")) ||
+           voices.find(v => v.name.includes("Google") && v.lang.startsWith("en")) ||
+           voices.find(v => v.lang.startsWith("en")) || voices[0];
+  }
+
+  async function speakText(text) {
+    if (currentAudio) {
+      try { currentAudio.pause(); } catch (_) {}
+      currentAudio = null;
     }
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+
+    try {
+      const resp = await fetch("/api/tts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: text })
+      });
+      if (resp.ok) {
+        const blob = await resp.blob();
+        const audioUrl = URL.createObjectURL(blob);
+        currentAudio = new Audio(audioUrl);
+        await currentAudio.play();
+        return;
+      }
+    } catch (err) {
+      console.warn("Rime TTS API call error, falling back to Web Speech:", err);
+    }
+
+    if (!('speechSynthesis' in window)) return;
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.rate = 1.0;
+    const voice = getBestVoice();
+    if (voice) utter.voice = voice;
+    window.speechSynthesis.speak(utter);
+  }
+
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.onvoiceschanged = () => { getBestVoice(); };
   }
 
   async function sendUserMessage(text) {

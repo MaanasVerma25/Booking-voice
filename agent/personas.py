@@ -90,10 +90,10 @@ SCENARIOS = {
         "recommended": "arcade",
         "voices": [
             {
-                "id": "arcade",
-                "name": "Arcade",
+                "id": "luna",
+                "name": "Luna",
                 "char": "Priya",
-                "desc": "warm and respectful",
+                "desc": "warm and natural female",
                 "greeting": "Namaste! Thank you for calling Apex Healthcare Clinic, this is Priya. I can help you book doctor appointments, check consultation fees in rupees, inquire about lab tests, telehealth, or health insurance. How can I assist you today?"
             }
         ]
@@ -101,7 +101,7 @@ SCENARIOS = {
 }
 
 VOICE_SPEED = {
-    "arcade": 1.0,
+    "luna": 1.0,
 }
 
 def voice_entry(industry="healthcare", voice_id="arcade"):

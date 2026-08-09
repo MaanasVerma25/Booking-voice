@@ -991,27 +991,51 @@
       mockTranscript = "";
       talking = true;
       document.body.classList.add("rec");
-      setStatus("Listening… speak into mic, tap mic to send");
 
       const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (SpeechRec) {
-        try {
-          recognition = new SpeechRec();
-          recognition.continuous = true;
-          recognition.interimResults = true;
-          recognition.lang = "en-US";
-          recognition.onresult = (ev) => {
-            let resStr = "";
-            for (let i = ev.resultIndex; i < ev.results.length; i++) {
-              resStr += ev.results[i][0].transcript;
-            }
-            if (resStr.trim()) {
-              mockTranscript = resStr;
-              setStatus("Hearing: \"" + resStr.trim() + "\"");
-            }
-          };
-          recognition.start();
-        } catch (e) { console.warn("SpeechRec error", e); }
+      if (!SpeechRec) {
+        setStatus("Speech recognition not supported in this browser. Please type below.");
+        talking = false;
+        document.body.classList.remove("rec");
+        return;
+      }
+
+      try {
+        recognition = new SpeechRec();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = "en-US";
+        
+        setStatus("Listening… speak into mic, tap mic to send");
+
+        recognition.onresult = (ev) => {
+          let resStr = "";
+          for (let i = ev.resultIndex; i < ev.results.length; i++) {
+            resStr += ev.results[i][0].transcript;
+          }
+          if (resStr.trim()) {
+            mockTranscript = resStr.trim();
+            setStatus("Hearing: \"" + mockTranscript + "\"");
+          }
+        };
+
+        recognition.onerror = (ev) => {
+          console.warn("SpeechRec error:", ev.error);
+          if (ev.error === "not-allowed") {
+            setStatus("Microphone access denied. Please allow mic access in your browser.");
+          } else if (ev.error === "no-speech") {
+            setStatus("No speech detected. Speak clearly and tap mic to send.");
+          } else {
+            setStatus("Speech error: " + ev.error);
+          }
+        };
+
+        recognition.start();
+      } catch (e) {
+        console.warn("SpeechRec start exception:", e);
+        setStatus("Microphone error. Please type your message below.");
+        talking = false;
+        document.body.classList.remove("rec");
       }
     } else {
       talking = false;
@@ -1020,8 +1044,13 @@
         try { recognition.stop(); } catch(_) {}
         recognition = null;
       }
-      const spoken = mockTranscript.trim() || "I would like to query appointment availability.";
-      sendUserMessage(spoken);
+      
+      const spoken = mockTranscript.trim();
+      if (spoken) {
+        sendUserMessage(spoken);
+      } else {
+        setStatus("No speech detected. Try speaking again or type below.");
+      }
     }
   });
 

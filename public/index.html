@@ -1258,36 +1258,35 @@
     activeTTSAbortController = new AbortController();
     const signal = activeTTSAbortController.signal;
 
-    // Split into sentences for ultra-fast audio startup (sub-200ms latency)
-    const sentences = text.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [text];
+    // Split into sentences; filter blanks
+    const sentences = (text.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [text])
+      .map(s => s.trim()).filter(Boolean);
 
     try {
-      for (let i = 0; i < sentences.length; i++) {
-        if (signal.aborted) break;
-        const sent = sentences[i].trim();
-        if (!sent) continue;
-
-        const resp = await fetch("/api/tts", {
+      // Kick off ALL sentence fetches in parallel immediately
+      // so audio for sentence N+1 is ready the moment sentence N ends
+      const blobPromises = sentences.map(sent =>
+        fetch("/api/tts", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ text: sent }),
           signal: signal
-        });
+        }).then(r => r.ok ? r.blob() : null).catch(() => null)
+      );
 
+      // Play each blob sequentially as soon as it resolves
+      for (let i = 0; i < blobPromises.length; i++) {
         if (signal.aborted) break;
-
-        if (resp.ok) {
-          const blob = await resp.blob();
-          if (signal.aborted) break;
-          const audioUrl = URL.createObjectURL(blob);
-          currentAudio = new Audio(audioUrl);
-          
-          await new Promise((resolve) => {
-            currentAudio.onended = resolve;
-            currentAudio.onerror = resolve;
-            currentAudio.play().catch(resolve);
-          });
-        }
+        const blob = await blobPromises[i];
+        if (!blob || signal.aborted) continue;
+        const audioUrl = URL.createObjectURL(blob);
+        currentAudio = new Audio(audioUrl);
+        await new Promise((resolve) => {
+          currentAudio.onended = resolve;
+          currentAudio.onerror = resolve;
+          currentAudio.play().catch(resolve);
+        });
+        URL.revokeObjectURL(audioUrl);
       }
       return;
     } catch (err) {

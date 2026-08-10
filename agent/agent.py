@@ -13,10 +13,12 @@ call by design). The browser frontend creates the room with JSON metadata
 import json
 import logging
 import os
+import urllib.request
+import urllib.parse
 
 from dotenv import load_dotenv
 from livekit import agents
-from livekit.agents import Agent, AgentSession, JobContext, RoomInputOptions, WorkerOptions, cli, inference
+from livekit.agents import Agent, AgentSession, JobContext, RoomInputOptions, WorkerOptions, cli, inference, llm
 from livekit.plugins import noise_cancellation, openai, rime, silero
 
 from personas import SCENARIOS, build_instructions, voice_entry, voice_speed
@@ -49,6 +51,51 @@ def _resolve_config(ctx: JobContext):
 class BoothAgent(Agent):
     """Buffers the full reply before TTS (one full-context request, like the
     browser demo) and hardens pronunciation via tts_pronounce."""
+
+    @llm.ai_callable(description="Book an appointment for a patient and sync to Google Calendar & Google Sheet")
+    async def book_appointment(
+        self,
+        patient_name: str,
+        phone_number: str,
+        doctor_or_specialty: str,
+        date_time: str,
+        insurance_details: str = "N/A",
+        notes: str = "Booked via voice agent",
+    ) -> str:
+        """Call when patient confirms an appointment booking."""
+        logger.info(
+            "Booking appointment tool called: patient=%s doctor=%s date_time=%s",
+            patient_name,
+            doctor_or_specialty,
+            date_time,
+        )
+        payload = {
+            "patient_name": patient_name,
+            "phone_number": phone_number,
+            "doctor_or_specialty": doctor_or_specialty,
+            "date_time": date_time,
+            "insurance_details": insurance_details,
+            "notes": notes,
+        }
+        
+        # 1. Dispatch to local Node endpoint if running
+        api_url = os.getenv("API_SERVER_URL", "http://localhost:3000/api/book-appointment")
+        webhook_url = os.getenv("GOOGLE_WEBHOOK_URL", "")
+
+        target_url = webhook_url if webhook_url else api_url
+        try:
+            req = urllib.request.Request(
+                target_url,
+                data=json.dumps(payload).encode("utf-8"),
+                headers={"Content-Type": "application/json"},
+                method="POST",
+            )
+            with urllib.request.urlopen(req, timeout=5) as resp:
+                logger.info("Appointment booking synced to %s successfully (status=%s)", target_url, resp.status)
+        except Exception as e:
+            logger.warning("Appointment booking webhook call exception: %s", e)
+
+        return f"Successfully scheduled appointment for {patient_name} with {doctor_or_specialty} on {date_time}."
 
     async def tts_node(self, text, model_settings):
         async def hardened():

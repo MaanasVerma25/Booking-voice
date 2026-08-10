@@ -11,3 +11,4 @@ agent/__pycache__
 *.pyc
 .vercel
 .env*
+data/

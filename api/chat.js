@@ -2,6 +2,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { createAppointmentBooking } from "./booking.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -11,7 +12,6 @@ function getGroqKey() {
   if (process.env.GROQ_API_KEY && !process.env.GROQ_API_KEY.includes("your_")) {
     return process.env.GROQ_API_KEY;
   }
-  // Try loading from agent/.env
   try {
     const agentEnvPath = path.join(__dirname, "..", "agent", ".env");
     if (fs.existsSync(agentEnvPath)) {
@@ -29,80 +29,50 @@ const SYSTEM_PROMPT = `You are Priya, a warm, caring, respectful, and profession
 
 Your responsibilities:
 1. Book, reschedule, or cancel patient appointments.
+CRITICAL BOOKING RULE: Whenever a patient asks to book an appointment (or provides a date/time and doctor preference), YOU MUST CALL THE 'book_appointment' FUNCTION TOOL IMMEDIATELY in that turn to register it in Google Calendar and Google Sheets. Never just verbally confirm an appointment without invoking 'book_appointment'. If missing phone or name, use what is available or 'Valued Patient' and invoke the tool immediately.
+
 2. Answer inquiries about specialties, board-certified Indian doctors, consultation pricing in INR (rupees), lab & diagnostic tests, operating hours, telehealth, in-house pharmacy, accepted health insurance / cashless TPA, payment options (UPI, card, cash), parking, and clinic policies.
-3. Provide helpful, accurate responses to patient questions using Groq LLM intelligence.
 
-Apex Healthcare Clinic (India) Comprehensive Database:
-
-1. Location & Contact Information:
+Apex Healthcare Clinic (India) Database:
 - Address: One hundred eight Ring Road, Near Cyber City, Phase Two, Gurugram, Haryana.
-- Parking & Access: Free multi-level patient parking garage with complimentary valet service, ramp access, and wheelchair assistance at the main entrance.
-- Direct Emergency Line: Available twenty-four hours a day, seven days a week.
+- Regular Hours: Monday through Saturday eight AM to eight PM, Sunday nine AM to two PM.
+- Emergency / Urgent Care: Open twenty-four hours.
 
-2. Operating Hours & Urgent Care:
-- Regular Clinic Hours: Monday through Saturday from eight AM to eight PM, Sunday nine AM to two PM.
-- Urgent Care & Emergency Triage: Open twenty-four hours a day, seven days a week.
-- Voice AI Concierge: Available twenty-four seven.
+Specialists & Consultation Fees:
+- General Medicine: Dr. Rajesh Sharma (five hundred rupees).
+- Cardiology: Dr. Ananya Deshmukh (one thousand two hundred rupees).
+- Pediatrics: Dr. Amit Patel (seven hundred rupees).
+- Dermatology: Dr. Sunita Rao (nine hundred rupees).
+- Orthopedics: Dr. Vikram Malhotra (one thousand rupees).
+- Neurology: Dr. Rohan Verma (one thousand five hundred rupees).
+- Gastroenterology: Dr. Meera Nambiar (one thousand one hundred rupees).
+- ENT: Dr. Sanjay Gupta (eight hundred rupees).
 
-3. Board-Certified Specialists & Consultation Fees (in Indian Rupees):
-- General Medicine / Family Health: Dr. Rajesh Sharma (consultation fee: five hundred rupees). Routine checkups, fever treatment, diabetes and hypertension management.
-- Cardiology: Dr. Ananya Deshmukh (consultation fee: one thousand two hundred rupees). ECG evaluations, heart disease screenings, echo testing, and blood pressure care.
-- Pediatrics: Dr. Amit Patel (consultation fee: seven hundred rupees). Child vaccinations, growth monitoring, and pediatric illness care.
-- Dermatology & Skin Care: Dr. Sunita Rao (consultation fee: nine hundred rupees). Acne treatments, eczema, hair loss care, skin cancer screening, and mole evaluation.
-- Orthopedics & Joint Care: Dr. Vikram Malhotra (consultation fee: one thousand rupees). Joint pain, arthritis, fracture management, and physical therapy referrals.
-- Neurology & Headache Clinic: Dr. Rohan Verma (consultation fee: one thousand five hundred rupees). Migraine management, nerve assessments, epilepsy, and stroke rehabilitation consultation.
-- Gastroenterology: Dr. Meera Nambiar (consultation fee: one thousand one hundred rupees). Acid reflux, IBS care, digestive health, and endoscopy consultation.
-- ENT & Allergy Specialist: Dr. Sanjay Gupta (consultation fee: eight hundred rupees). Sinusitis, allergy testing, hearing evaluations, and throat care.
+VOICE RULES:
+- Keep replies concise (1 to 3 sentences) and conversational in clear Indian English.
+- Never write digits or symbols: spell numbers and currency as words (e.g., five hundred rupees, ten AM).`;
 
-4. Diagnostic Imaging & Laboratory Services (in Indian Rupees):
-- Complete Blood Count (CBC): three hundred fifty rupees. Result time: twenty-four hours.
-- Comprehensive Lipid & Metabolic Panel: six hundred rupees. Result time: twenty-four hours.
-- Diagnostic X-Ray Scan: eight hundred rupees. Same-day digital report.
-- High-Field MRI Scan: four thousand five hundred rupees. Results delivered within forty-eight hours.
-- Ultrasound Scan: one thousand two hundred rupees. Result time: twenty-four hours.
-- Digital Mammography Screening: one thousand five hundred rupees.
-- ECG / EKG Heart Screening: four hundred rupees. Immediate preliminary read.
-- Fasting Blood Glucose & HbA1c: four hundred fifty rupees.
-* All diagnostic reports are uploaded directly to the patient's WhatsApp and MyApex online portal.
-
-5. Telehealth & Virtual Consultation Services:
-- Virtual video consultations are offered for all non-emergency follow-ups, prescription renewals, and general medical inquiries.
-- Telehealth pricing receives a twenty percent discount off standard in-person consultation rates (e.g., General Medicine virtual consult is four hundred rupees).
-- Accessible via smartphone app, WhatsApp video link, or web browser.
-
-6. In-House Pharmacy & Prescription Refills:
-- Pharmacy Hours: Monday through Saturday eight AM to eight thirty PM, Sunday nine AM to two PM.
-- Prescription Transfers & Home Delivery: Free medicine delivery within five kilometers for orders above five hundred rupees.
-- Refill Line: Patients can request refills twenty-four seven via Priya or the MyApex portal.
-
-7. Immunizations & Preventive Vaccines:
-- Seasonal Flu Vaccine: six hundred rupees.
-- COVID-19 Booster: Free of charge.
-- Tdap / Tetanus Shot: three hundred rupees.
-- Travel Vaccines (Hepatitis, Typhoid): Prices vary; consultation required.
-
-8. Accepted Insurance, Cashless TPA & Payment Options:
-- Accepted Health Insurance & TPA: Star Health, HDFC ERGO, ICICI Lombard, Niva Bupa, Care Health Insurance, Reliance General, Ayushman Bharat (PM-JAY), and Bajaj Allianz.
-- Payment Methods: UPI (Google Pay, PhonePe, Paytm, BHIM), Credit Cards, Debit Cards, Net Banking, and Cash.
-- Self-Pay Discount: Ten percent prompt-pay discount for same-day cash/UPI settlements.
-- No-Cost EMI: Flexible EMI payment options for medical bills exceeding five thousand rupees.
-
-9. Appointment & Cancellation Policy:
-- Booking Information Needed: Patient's full name, preferred specialty or physician, preferred date and time, mobile number, and insurance/TPA details if applicable.
-- Cancellation / Rescheduling: Requires at least twenty-four hours advance notice to avoid a two hundred rupee late cancellation fee.
-- Arrival Policy: First-time patients should arrive ten minutes early for registration with a valid government ID (Aadhaar, Voter ID, or Driving License).
-
-10. Patient Portal (MyApex Hub):
-- View lab reports, download tax deduction certificates (Section 80D), request medicine home delivery, and consult doctors online.
-
-VOICE & DIALOGUE RULES:
-- Use clear, reassuring, respectful, and empathetic Indian English.
-- Keep replies concise (1 to 3 sentences) and conversational.
-- Never write digits or symbols: spell numbers and currency as words (e.g., five hundred rupees, eight AM to eight PM, one thousand two hundred rupees).
-- Use contractions naturally (I'm, we're, don't, it's, couldn't).
-- Be helpful, knowledgeable, and respectful, like a senior Indian medical care coordinator.
-- If the user describes a life-threatening medical emergency (severe chest pain, breathing difficulty, stroke symptoms, major trauma), immediately instruct them to hang up and call one one two or one zero eight for emergency ambulance services.
-- CRITICAL INSTRUCTION FOR UNKNOWN / UNLISTED INFORMATION: For every user query, analyze the input carefully and retrieve exact information from the database above. If the user asks a question about something NOT explicitly detailed in the clinic database (e.g., general health tips, random trivia, unlisted doctor schedules, or custom queries), use your Groq LLM intelligence to think creatively and synthesize a plausible, polite, appropriate, and reassuring response that Priya (the Senior Care Coordinator) thinks is fitting for the clinic context. Never fail to answer or say you don't know — generate an appropriate, contextually fitting response.`;
+const TOOLS = [
+  {
+    type: "function",
+    function: {
+      name: "book_appointment",
+      description: "Saves appointment directly to Google Calendar and Google Sheets",
+      parameters: {
+        type: "object",
+        properties: {
+          patient_name: { type: "string", description: "Full name of the patient (default to 'Valued Patient' if not specified)" },
+          phone_number: { type: "string", description: "Mobile / contact phone number" },
+          doctor_or_specialty: { type: "string", description: "Doctor name or medical specialty" },
+          date_time: { type: "string", description: "Date and time requested for appointment" },
+          insurance_details: { type: "string", description: "Insurance or cashless TPA details" },
+          notes: { type: "string", description: "Reason for visit or additional notes" }
+        },
+        required: ["doctor_or_specialty", "date_time"]
+      }
+    }
+  }
+];
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -138,6 +108,9 @@ export default async function handler(req, res) {
       { role: "user", content: userMessage }
     ];
 
+    // Force or strongly encourage tool calling if message mentions book/appointment
+    const mentionsBooking = /book|appointment|schedule|consult/i.test(userMessage);
+
     const groqResponse = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -147,39 +120,67 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         model: "llama-3.3-70b-versatile",
         messages: messages,
-        temperature: 0.6,
-        max_tokens: 250
+        tools: TOOLS,
+        tool_choice: mentionsBooking ? { type: "function", function: { name: "book_appointment" } } : "auto",
+        temperature: 0.5,
+        max_tokens: 300
       })
     });
 
     if (!groqResponse.ok) {
       const errText = await groqResponse.text();
       console.error("Groq API error response:", errText);
-      // Try a secondary fast model if 70b has rate limit or error
-      const retryResponse = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${apiKey}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          model: "llama-3.1-8b-instant",
-          messages: messages,
-          temperature: 0.6,
-          max_tokens: 250
-        })
-      });
-      if (retryResponse.ok) {
-        const retryData = await retryResponse.json();
-        const reply = retryData.choices?.[0]?.message?.content || "I am here to assist you at Apex Medical Center. How can I help?";
-        return res.status(200).json({ reply, model: "llama-3.1-8b-instant" });
-      }
       throw new Error(`Groq API returned status ${groqResponse.status}`);
     }
 
     const data = await groqResponse.json();
-    const reply = data.choices?.[0]?.message?.content || "Thank you for reaching out to Apex Medical Center. How else can I assist you?";
+    const choiceMessage = data.choices?.[0]?.message;
 
+    // Check if the LLM invoked tool call 'book_appointment'
+    if (choiceMessage?.tool_calls && choiceMessage.tool_calls.length > 0) {
+      const toolCall = choiceMessage.tool_calls[0];
+      if (toolCall.function?.name === "book_appointment") {
+        let args = {};
+        try {
+          args = JSON.parse(toolCall.function.arguments || "{}");
+        } catch (_) {}
+
+        console.log("[Groq Chat] Executing tool call book_appointment with args:", args);
+        const bookingResult = await createAppointmentBooking(args);
+
+        // Append tool execution context
+        messages.push(choiceMessage);
+        messages.push({
+          role: "tool",
+          tool_call_id: toolCall.id,
+          name: "book_appointment",
+          content: JSON.stringify(bookingResult)
+        });
+
+        // Request final spoken response from LLM confirming booking
+        const followUpResponse = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${apiKey}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: "llama-3.3-70b-versatile",
+            messages: messages,
+            temperature: 0.5,
+            max_tokens: 250
+          })
+        });
+
+        if (followUpResponse.ok) {
+          const followUpData = await followUpResponse.json();
+          const reply = followUpData.choices?.[0]?.message?.content || `I have booked your appointment for ${args.patient_name || 'you'} with ${args.doctor_or_specialty || 'our specialist'} on ${args.date_time || 'the requested time'} and saved it to Google Calendar and Sheets.`;
+          return res.status(200).json({ reply, booking: bookingResult, model: "llama-3.3-70b-versatile" });
+        }
+      }
+    }
+
+    const reply = choiceMessage?.content || "Thank you for reaching out to Apex Medical Center. How else can I assist you?";
     return res.status(200).json({ reply, model: "llama-3.3-70b-versatile" });
 
   } catch (err) {

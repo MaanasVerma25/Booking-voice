@@ -736,7 +736,7 @@ In mock demo mode, type the same booking request in the chat interface. The Groq
 ---
 
 <p align="center">
-  <sub>Built with ❤️ using LiveKit Agents, Rime Coda TTS, Groq, Deepgram, Google Sheets & Google Calendar</sub>
+  <sub>Built by Maanas,Kartikeya,Yogita and Varuni using Rime Coda TTS, Groq, Qdrant, Google Sheets & Google Calendar</sub>
   <br />
   <sub>© 2026 Apex Healthcare Clinic Voice AI</sub>
 </p>

@@ -9,7 +9,7 @@
 
 <h1 align="center">
   <br />
-  🏥 Apex Healthcare Clinic — AI Voice Booking Agent
+  Apex Healthcare Clinic — AI Voice Booking Agent
   <br />
   <sub>Real-time conversational AI for healthcare appointment scheduling with Google Calendar & Sheets sync</sub>
 </h1>
@@ -30,7 +30,7 @@ A full-stack **AI voice agent** that powers appointment booking at Apex Healthca
 
 ---
 
-## ✨ Features
+##  Features
 
 | Feature | Details |
 |:--------|:--------|
@@ -49,30 +49,30 @@ A full-stack **AI voice agent** that powers appointment booking at Apex Healthca
 
 ---
 
-## 🏗️ System Architecture
+##  System Architecture
 
 ```mermaid
 graph TB
-    subgraph CLIENT["🖥️ Browser Client"]
+    subgraph CLIENT[" Browser Client"]
         UI["Premium Web UI<br/>(index.html)"]
         LK_JS["LiveKit JS SDK"]
         MIC["Microphone Input"]
         SPEAKER["Audio Output"]
     end
 
-    subgraph VERCEL["☁️ Vercel / Node.js Server"]
+    subgraph VERCEL[" Vercel / Node.js Server"]
         TOKEN["/api/token<br/>JWT Minting"]
         CHAT["/api/chat<br/>Groq LLM + Tool Calls"]
         TTS_API["/api/tts<br/>Rime Coda TTS Proxy"]
         BOOK["/api/book-appointment<br/>Booking Orchestrator"]
     end
 
-    subgraph LIVEKIT["🔴 LiveKit Cloud"]
+    subgraph LIVEKIT[" LiveKit Cloud"]
         ROOM["LiveKit Room"]
         DISPATCH["Agent Dispatch<br/>(booth-agent)"]
     end
 
-    subgraph AGENT["🤖 Python Voice Agent"]
+    subgraph AGENT[" Python Voice Agent"]
         ENTRY["Entrypoint<br/>(agent.py)"]
         PERSONA["Persona Engine<br/>(personas.py — Priya)"]
         PRONOUNCE["Pronunciation<br/>Hardening<br/>(pronounce.py)"]
@@ -88,13 +88,13 @@ graph TB
         BVC["BVC Noise<br/>Cancellation"]
     end
 
-    subgraph GOOGLE["🟢 Google Workspace"]
+    subgraph GOOGLE[" Google Workspace"]
         GAS["Google Apps Script<br/>(Webhook)"]
         GCAL["Google Calendar<br/>(Event Creation)"]
         GSHEET["Google Sheets<br/>(Appointment Log)"]
     end
 
-    subgraph STORAGE["💾 Local Storage"]
+    subgraph STORAGE[" Local Storage"]
         JSON_DB["data/appointments.json"]
     end
 
@@ -134,7 +134,7 @@ graph TB
 
 ---
 
-## 📅 Google Sheets & Calendar Integration
+##  Google Sheets & Calendar Integration
 
 The appointment booking system connects to **Google Workspace** via a Google Apps Script webhook. When a patient books an appointment — via voice or chat — the data flows through a dual-write pipeline:
 
@@ -153,7 +153,7 @@ flowchart LR
 
     subgraph GOOGLE_WS["🟢 Google Workspace"]
         GAS_FN["doPost(e)<br/>Apps Script Function"]
-        SHEET["📊 Google Sheet<br/>Apex Clinic Appointments"]
+        SHEET[" Google Sheet<br/>Apex Clinic Appointments"]
         CAL["📅 Google Calendar<br/>30-min Event Created"]
     end
 
@@ -190,11 +190,11 @@ Each confirmed booking creates a **30-minute calendar event** with the title for
 
 The event description includes all collected patient details.
 
-> 📖 **Full Setup Guide** → See [`GOOGLE_INTEGRATION.md`](GOOGLE_INTEGRATION.md) for step-by-step setup instructions.
+>  **Full Setup Guide** → See [`GOOGLE_INTEGRATION.md`](GOOGLE_INTEGRATION.md) for step-by-step setup instructions.
 
 ---
 
-## 🔄 Call Flow Sequence
+##  Call Flow Sequence
 
 ```mermaid
 sequenceDiagram
@@ -475,11 +475,11 @@ npm run dev
 # → http://localhost:3000
 ```
 
-> **💡 No API keys?** The app automatically falls into **Mock Demo Mode** — Priya responds with intelligent replies using the Groq Chat API and the browser's built-in speech synthesis. Perfect for UI development and demos.
+> ** No API keys?** The app automatically falls into **Mock Demo Mode** — Priya responds with intelligent replies using the Groq Chat API and the browser's built-in speech synthesis. Perfect for UI development and demos.
 
 ---
 
-## 🧠 Agent Intelligence
+##  Agent Intelligence
 
 ### Persona System
 
@@ -488,13 +488,13 @@ The agent embodies **Priya**, a Senior Care Coordinator at Apex Healthcare Clini
 ```mermaid
 mindmap
   root((Priya<br/>Senior Care<br/>Coordinator))
-    📅 Appointments
+     Appointments
       Book new visits
       Reschedule existing
       Cancel appointments
       Auto-sync to Google Calendar
       Log to Google Sheets
-    👨‍⚕️ Doctors & Specialties
+     Doctors & Specialties
       Dr. Rajesh Sharma — General Medicine — ₹500
       Dr. Ananya Deshmukh — Cardiology — ₹1200
       Dr. Amit Patel — Pediatrics — ₹700
@@ -503,19 +503,19 @@ mindmap
       Dr. Rohan Verma — Neurology — ₹1500
       Dr. Meera Nambiar — Gastroenterology — ₹1100
       Dr. Sanjay Gupta — ENT — ₹800
-    🏥 Clinic Info
+     Clinic Info
       Hours: Mon-Sat 8AM-8PM, Sun 9AM-2PM
       Location: 108 Ring Road, Gurugram
       24/7 Emergency & Urgent Care
-    💳 Insurance & Payment
+     Insurance & Payment
       Star Health, HDFC ERGO, ICICI Lombard
       Niva Bupa, Care Health, Ayushman Bharat
       UPI, Cards, Cash, EMI options
-    🔬 Lab & Diagnostics
+     Lab & Diagnostics
       CBC ₹350, Lipid Panel ₹600
       X-Ray ₹800, MRI ₹4500
       ECG ₹400, Ultrasound ₹1200
-    📱 Telehealth
+     Telehealth
       20% discount on virtual consults
       WhatsApp video, app, or browser
 ```
@@ -526,10 +526,10 @@ The Groq Llama 3.3 LLM is equipped with a `book_appointment` function tool. When
 
 ```mermaid
 flowchart TD
-    A["👤 Patient speaks:<br/>'Book Dr. Rajesh tomorrow 10 AM'"] --> B{"🧠 LLM Checks:<br/>All 4 fields collected?"}
-    B -->|"❌ Missing fields"| C["Ask patient for<br/>missing details"]
+    A[" Patient speaks:<br/>'Book Dr. Rajesh tomorrow 10 AM'"] --> B{"🧠 LLM Checks:<br/>All 4 fields collected?"}
+    B -->|" Missing fields"| C["Ask patient for<br/>missing details"]
     C --> A
-    B -->|"✅ All collected"| D["LLM emits tool_call:<br/>book_appointment(...)"]
+    B -->|" All collected"| D["LLM emits tool_call:<br/>book_appointment(...)"]
     D --> E["/api/book-appointment<br/>Node.js handler"]
     E --> F["💾 Save to<br/>appointments.json"]
     E --> G{"GOOGLE_WEBHOOK_URL<br/>configured?"}

@@ -27,11 +27,18 @@ function getGroqKey() {
 
 const SYSTEM_PROMPT = `You are Priya, a warm, caring, respectful, and professional Senior Care Coordinator at Apex Healthcare Clinic in Gurugram, India.
 
-Your responsibilities:
-1. Book, reschedule, or cancel patient appointments.
-CRITICAL BOOKING RULE: Whenever a patient asks to book an appointment (or provides a date/time and doctor preference), YOU MUST CALL THE 'book_appointment' FUNCTION TOOL IMMEDIATELY in that turn to register it in Google Calendar and Google Sheets. Never just verbally confirm an appointment without invoking 'book_appointment'. If missing phone or name, use what is available or 'Valued Patient' and invoke the tool immediately.
+APPOINTMENT BOOKING WORKFLOW:
+When a patient expresses interest in booking an appointment, check if you have all required booking details:
+1. Patient's Full Name
+2. Contact Mobile / Phone Number
+3. Specialty or Doctor required (e.g. Dr. Rajesh Sharma for General Medicine, Dr. Ananya Deshmukh for Cardiology, Dr. Sunita Rao for Dermatology, Dr. Amit Patel for Pediatrics, Dr. Vikram Malhotra for Orthopedics, Dr. Rohan Verma for Neurology, Dr. Meera Nambiar for Gastroenterology, Dr. Sanjay Gupta for ENT)
+4. Preferred Date and Time
 
-2. Answer inquiries about specialties, board-certified Indian doctors, consultation pricing in INR (rupees), lab & diagnostic tests, operating hours, telehealth, in-house pharmacy, accepted health insurance / cashless TPA, payment options (UPI, card, cash), parking, and clinic policies.
+IF ANY DETAILS ARE MISSING:
+Warmly ask the patient for the missing information in a concise, polite sentence (e.g., "I would be happy to book an appointment for you! May I please have your full name, contact phone number, and preferred doctor or specialty?"). Do NOT invoke 'book_appointment' until you have the patient's name, phone number, doctor/specialty, and date/time.
+
+ONCE YOU HAVE ALL DETAILS (Name, Phone Number, Doctor/Specialty, Date/Time):
+Invoke the 'book_appointment' function tool to register the appointment in Google Calendar and Google Sheets, and confirm the details to the patient.
 
 Apex Healthcare Clinic (India) Database:
 - Address: One hundred eight Ring Road, Near Cyber City, Phase Two, Gurugram, Haryana.
@@ -48,27 +55,27 @@ Specialists & Consultation Fees:
 - Gastroenterology: Dr. Meera Nambiar (one thousand one hundred rupees).
 - ENT: Dr. Sanjay Gupta (eight hundred rupees).
 
-VOICE RULES:
-- Keep replies concise (1 to 3 sentences) and conversational in clear Indian English.
-- Never write digits or symbols: spell numbers and currency as words (e.g., five hundred rupees, ten AM).`;
+VOICE & DIALOGUE RULES:
+- Keep replies concise (1 to 3 sentences) and conversational in clear, respectful Indian English.
+- Never write digits or symbols: spell numbers and currency as words (e.g., five hundred rupees, ten AM, nine eight seven six five four three two one zero).`;
 
 const TOOLS = [
   {
     type: "function",
     function: {
       name: "book_appointment",
-      description: "Saves appointment directly to Google Calendar and Google Sheets",
+      description: "Saves appointment directly to Google Calendar and Google Sheets once patient name, phone number, doctor/specialty, and date/time are collected.",
       parameters: {
         type: "object",
         properties: {
-          patient_name: { type: "string", description: "Full name of the patient (default to 'Valued Patient' if not specified)" },
-          phone_number: { type: "string", description: "Mobile / contact phone number" },
-          doctor_or_specialty: { type: "string", description: "Doctor name or medical specialty" },
+          patient_name: { type: "string", description: "Full name of the patient" },
+          phone_number: { type: "string", description: "Mobile / contact phone number of the patient" },
+          doctor_or_specialty: { type: "string", description: "Doctor name or medical specialty required" },
           date_time: { type: "string", description: "Date and time requested for appointment" },
-          insurance_details: { type: "string", description: "Insurance or cashless TPA details" },
+          insurance_details: { type: "string", description: "Insurance or cashless TPA details if provided" },
           notes: { type: "string", description: "Reason for visit or additional notes" }
         },
-        required: ["doctor_or_specialty", "date_time"]
+        required: ["patient_name", "phone_number", "doctor_or_specialty", "date_time"]
       }
     }
   }
@@ -108,9 +115,6 @@ export default async function handler(req, res) {
       { role: "user", content: userMessage }
     ];
 
-    // Force or strongly encourage tool calling if message mentions book/appointment
-    const mentionsBooking = /book|appointment|schedule|consult/i.test(userMessage);
-
     const groqResponse = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -121,7 +125,7 @@ export default async function handler(req, res) {
         model: "llama-3.3-70b-versatile",
         messages: messages,
         tools: TOOLS,
-        tool_choice: mentionsBooking ? { type: "function", function: { name: "book_appointment" } } : "auto",
+        tool_choice: "auto",
         temperature: 0.5,
         max_tokens: 300
       })

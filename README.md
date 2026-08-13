@@ -30,6 +30,10 @@ A full-stack **AI voice agent** that powers appointment booking at Apex Healthca
 
 ---
 
+
+https://github.com/user-attachments/assets/acbdf94d-e796-46b2-8f7a-7f1bd4d84168
+
+🔗 **[Watch the full demo on YouTube](https://www.youtube.com/watch?v=OV0wJUCw5n0)**
 ##  Features
 
 | Feature | Details |

@@ -1910,6 +1910,7 @@
           phone: meta.phone_number || currentUser.phone || "",
           email: currentUser.email || ""
         };
+        reqPayload.records = Array.isArray(patientRecords) ? patientRecords : [];
       }
       const resp = await fetch("/api/chat", {
         method: "POST",
@@ -2591,11 +2592,12 @@
       }
 
       rxSubmitBtn.disabled = true;
-      rxSubmitBtn.textContent = "Uploading to Supabase...";
+      rxSubmitBtn.textContent = "Running OCR & Uploading to Supabase...";
 
       try {
         let fileUrl = "";
         let filePath = "";
+        let ocrText = "";
 
         // Read file as Base64 Data URL for instant rendering & local fallback
         const base64Url = await new Promise((resolve) => {
@@ -2605,6 +2607,21 @@
         });
 
         fileUrl = base64Url;
+
+        // Run OCR.space Text Extraction
+        try {
+          const ocrResp = await fetch("/api/ocr", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ base64Data: base64Url, fileType: selectedRxFile.type })
+          });
+          const ocrData = await ocrResp.json();
+          if (ocrData && ocrData.success && ocrData.ocrText) {
+            ocrText = ocrData.ocrText;
+          }
+        } catch (ocrErr) {
+          console.warn("OCR API call error:", ocrErr);
+        }
 
         // 1. Try Supabase Storage Upload
         if (supabaseClient) {
@@ -2637,6 +2654,7 @@
           file_url: fileUrl,
           file_size: selectedRxFile.size,
           file_type: selectedRxFile.type,
+          ocr_text: ocrText,
           created_at: new Date().toISOString()
         };
 
@@ -2654,7 +2672,8 @@
                 file_path: newRecord.file_path,
                 file_url: newRecord.file_url,
                 file_size: newRecord.file_size,
-                file_type: newRecord.file_type
+                file_type: newRecord.file_type,
+                ocr_text: newRecord.ocr_text
               }])
               .select();
 
@@ -2673,7 +2692,7 @@
         // Reset form
         rxUploadForm.reset();
         setSelectedRxFile(null);
-        alert("Success! Your medical record has been uploaded and stored securely.");
+        alert("Success! Your medical record has been converted to text via OCR and stored securely in Supabase.");
 
       } catch (err) {
         console.error("Error uploading medical record:", err);
@@ -2727,11 +2746,28 @@
     if (previewBody) {
       previewBody.innerHTML = "";
       const type = (rec.file_type || "").toLowerCase();
+      let mediaHtml = "";
       if (type.includes("pdf") || (rec.file_url || "").startsWith("data:application/pdf")) {
-        previewBody.innerHTML = `<iframe src="${rec.file_url}"></iframe>`;
+        mediaHtml = `<iframe src="${rec.file_url}"></iframe>`;
       } else {
-        previewBody.innerHTML = `<img src="${rec.file_url}" alt="${escapeHtml(rec.title)}" />`;
+        mediaHtml = `<img src="${rec.file_url}" alt="${escapeHtml(rec.title)}" />`;
       }
+
+      let ocrHtml = "";
+      if (rec.ocr_text) {
+        ocrHtml = `
+          <div style="width: 100%; margin-top: 16px; padding: 14px; background: #ffffff; border: 1px solid var(--border-light); border-radius: 8px; font-size: 0.84rem; text-align: left;">
+            <div style="font-weight: 600; color: var(--accent-blue); margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              Extracted OCR Prescription Text (Priya AI Memory)
+            </div>
+            <pre style="white-space: pre-wrap; word-break: break-word; font-family: inherit; margin: 0; color: var(--text-primary); font-size: 0.82rem; max-height: 180px; overflow-y: auto;">${escapeHtml(rec.ocr_text)}</pre>
+          </div>
+        `;
+      }
+
+      previewBody.style.flexDirection = "column";
+      previewBody.innerHTML = mediaHtml + ocrHtml;
     }
 
     docPreviewOverlay.classList.add("active");

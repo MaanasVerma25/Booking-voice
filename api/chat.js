@@ -8,7 +8,7 @@ function getGroqKey() {
   return null;
 }
 
-function getSystemPrompt(user = null) {
+function getSystemPrompt(user = null, records = []) {
   const now = new Date();
   const currentDateStr = now.toLocaleDateString("en-US", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   const currentTimeStr = now.toLocaleTimeString("en-US", { hour: '2-digit', minute: '2-digit' });
@@ -22,8 +22,23 @@ function getSystemPrompt(user = null) {
 Note: This patient is LOGGED IN. You already have their name (${user.name || "Patient"}) and phone number (${user.phone || "Not provided"}). Do NOT ask them to repeat their name or phone number unless they ask to use a different contact. Automatically use these saved details when calling the 'book_appointment' tool.\n`;
   }
 
+  let recordsContext = "";
+  if (Array.isArray(records) && records.length > 0) {
+    recordsContext = `\nPATIENT UPLOADED MEDICAL VAULT & PRESCRIPTIONS:\nThe patient has uploaded the following prescriptions and medical reports to their account:\n`;
+    records.slice(0, 5).forEach((rec, idx) => {
+      recordsContext += `\n[Record ${idx + 1}]
+- Title: ${rec.title || rec.file_name || "Medical Document"}
+- Category: ${rec.category || "Prescription"}
+- Doctor/Clinic Notes: ${rec.doctor_notes || "None"}
+- Extracted OCR Text Content: ${rec.ocr_text ? rec.ocr_text.slice(0, 800) : "No OCR text extracted"}
+`;
+    });
+    recordsContext += `\nINSTRUCTION FOR PRESCRIPTION & LAB REPORT QUERIES:
+When the patient asks about their prescriptions, medications, lab test reports, or uploaded documents, use the information above to give precise, helpful, and caring answers. Always reassure them politely.\n`;
+  }
+
   return `You are Priya, a warm, caring, respectful, and professional Senior Care Coordinator at Apex Healthcare Clinic in Gurugram, India.
-Today's Clinic Date & Time: ${currentDateStr}, ${currentTimeStr}.${userContext}
+Today's Clinic Date & Time: ${currentDateStr}, ${currentTimeStr}.${userContext}${recordsContext}
 
 APPOINTMENT BOOKING WORKFLOW:
 When a patient expresses interest in booking an appointment, check if you have all required booking details:
@@ -95,6 +110,7 @@ export default async function handler(req, res) {
   const userMessage = body.message || "";
   const history = Array.isArray(body.history) ? body.history : [];
   const user = body.user && typeof body.user === "object" ? body.user : null;
+  const records = Array.isArray(body.records) ? body.records : [];
 
   if (!userMessage.trim()) {
     return res.status(400).json({ error: "Message is required" });
@@ -110,7 +126,7 @@ export default async function handler(req, res) {
 
   try {
     const messages = [
-      { role: "system", content: getSystemPrompt(user) },
+      { role: "system", content: getSystemPrompt(user, records) },
       ...history.map(h => ({ role: h.role === "user" ? "user" : "assistant", content: h.content })),
       { role: "user", content: userMessage }
     ];

@@ -7,6 +7,7 @@
     { "source": "/api/token", "destination": "/api/token" },
     { "source": "/api/chat", "destination": "/api/chat" },
     { "source": "/api/tts", "destination": "/api/tts" },
-    { "source": "/api/book-appointment", "destination": "/api/book-appointment" }
+    { "source": "/api/book-appointment", "destination": "/api/book-appointment" },
+    { "source": "/api/ocr", "destination": "/api/ocr" }
   ]
 }

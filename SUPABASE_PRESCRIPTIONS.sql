@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS public.medical_records (
   file_url TEXT NOT NULL,
   file_size BIGINT DEFAULT 0,
   file_type TEXT,
+  ocr_text TEXT, -- Transcribed text extracted via OCR.space API
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );

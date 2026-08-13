@@ -44,7 +44,7 @@ IF ANY DETAILS ARE MISSING:
 Warmly ask the patient for the missing information in a concise, polite sentence (e.g., "I would be happy to book an appointment for you! May I please have your full name, contact phone number, and preferred doctor or specialty?"). Do NOT invoke 'book_appointment' until you have the patient's name, phone number, doctor/specialty, and date/time.
 
 ONCE YOU HAVE ALL DETAILS (Name, Phone Number, Doctor/Specialty, Date/Time):
-Invoke the 'book_appointment' function tool to register the appointment in Google Calendar and Google Sheets, and confirm the details to the patient. For date_time argument, include both specific date and time clearly (e.g. "Tomorrow at 4:00 PM" or "2026-08-14 16:00").
+Invoke the 'book_appointment' function tool to register the appointment in Google Calendar and Google Sheets, and confirm the details to the patient. For date_time argument, include both specific date and time clearly (e.g. "Tomorrow at 4:00 PM" or "2026-08-14 16:00"). For phone_number argument, output numeric digits (e.g. "9876543210" or "+919876543210") even if spoken dialogue uses words.
 
 Apex Healthcare Clinic (India) Database:
 - Address: One hundred eight Ring Road, Near Cyber City, Phase Two, Gurugram, Haryana.
@@ -63,7 +63,7 @@ Specialists & Consultation Fees:
 
 VOICE & DIALOGUE RULES:
 - Keep replies concise (1 to 3 sentences) and conversational in clear, respectful Indian English.
-- Never write digits or symbols: spell numbers and currency as words (e.g., five hundred rupees, ten AM, nine eight seven six five four three two one zero).`;
+- Never write digits or symbols in spoken dialogue text: spell numbers and currency as words (e.g., five hundred rupees, ten AM, nine eight seven six five four three two one zero). However, inside tool function calls like book_appointment, use digits for phone numbers.`;
 }
 
 const TOOLS = [
@@ -76,7 +76,7 @@ const TOOLS = [
         type: "object",
         properties: {
           patient_name: { type: "string", description: "Full name of the patient" },
-          phone_number: { type: "string", description: "Mobile / contact phone number of the patient" },
+          phone_number: { type: "string", description: "Mobile / contact phone number of the patient (formatted as digits, e.g. 9876543210)" },
           doctor_or_specialty: { type: "string", description: "Doctor name or medical specialty required" },
           date_time: { type: "string", description: "Date and time requested for appointment (e.g. 'Tomorrow at 4:00 PM' or '2026-08-14 16:00')" },
           insurance_details: { type: "string", description: "Insurance or cashless TPA details if provided" },

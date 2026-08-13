@@ -9,15 +9,14 @@ This guide walks you through connecting your Apex Healthcare Voice Assistant to 
 ### Step 1: Create a Google Sheet
 1. Go to [Google Sheets](https://sheets.new) and create a new blank spreadsheet.
 2. Name the sheet **Apex Clinic Appointments**.
-3. In the first row (Header row), set up the following columns:
+3. In the first row (Header row), set up the following 7 columns:
    - **Column A**: `Timestamp`
    - **Column B**: `Patient Name`
    - **Column C**: `Phone Number`
    - **Column D**: `Doctor / Specialty`
    - **Column E**: `Appointment Date & Time`
-   - **Column F**: `Insurance / Payment`
-   - **Column G**: `Status`
-   - **Column H**: `Notes`
+   - **Column F**: `Status`
+   - **Column G**: `Notes`
 
 ---
 
@@ -39,7 +38,7 @@ function doPost(e) {
     var notes = data.notes || "Booked via Apex Voice Assistant";
     var timestamp = new Date();
 
-    // 1. Append to Google Sheet
+    // 1. Append to Google Sheet (7 Columns: Timestamp, Patient Name, Phone Number, Doctor / Specialty, Appointment Date & Time, Status, Notes)
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     sheet.appendRow([
       timestamp,
@@ -47,7 +46,6 @@ function doPost(e) {
       phone,
       doctor,
       dateTimeStr,
-      insurance,
       "Confirmed",
       notes
     ]);

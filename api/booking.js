@@ -133,6 +133,46 @@ export function parseDateTime(dateTimeStr) {
 }
 
 /**
+ * Normalizes phone numbers dictated in words (e.g. "nine eight seven six five four three two one zero")
+ * into digit strings (e.g. "9876543210").
+ */
+export function parsePhoneNumber(phoneStr) {
+  if (!phoneStr) return "Not provided";
+  const raw = String(phoneStr).trim();
+  if (!raw || raw.toLowerCase() === "not provided") return "Not provided";
+
+  let str = raw.toLowerCase();
+  
+  const wordDigits = {
+    "zero": "0", "oh": "0",
+    "one": "1",
+    "two": "2", "to": "2", "too": "2",
+    "three": "3",
+    "four": "4", "for": "4",
+    "five": "5",
+    "six": "6",
+    "seven": "7",
+    "eight": "8",
+    "nine": "9",
+    "plus": "+"
+  };
+
+  Object.keys(wordDigits).forEach(word => {
+    str = str.replace(new RegExp(`\\b${word}\\b`, "g"), wordDigits[word]);
+  });
+
+  const hasPlus = raw.startsWith("+") || str.startsWith("+") || raw.toLowerCase().includes("plus");
+  const digits = str.replace(/\D/g, "");
+
+  if (!digits) return raw;
+
+  if (hasPlus) {
+    return "+" + digits;
+  }
+  return digits;
+}
+
+/**
  * Creates an appointment booking.
  */
 export async function createAppointmentBooking(bookingData) {
@@ -150,12 +190,15 @@ export async function createAppointmentBooking(bookingData) {
     minute: "2-digit",
     hour12: true
   }) : rawDateTime;
+
+  const rawPhone = bookingData.phone_number || bookingData.phone || "Not provided";
+  const formattedPhone = parsePhoneNumber(rawPhone);
   
   const record = {
     id: "APT-" + Date.now(),
     timestamp,
     patient_name: bookingData.patient_name || bookingData.name || "Valued Patient",
-    phone_number: bookingData.phone_number || bookingData.phone || "Not provided",
+    phone_number: formattedPhone,
     doctor_or_specialty: bookingData.doctor_or_specialty || bookingData.doctor || "General Consultation",
     date_time: formattedDateTime,
     raw_date_time: rawDateTime,

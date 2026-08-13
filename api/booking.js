@@ -7,32 +7,23 @@ const __dirname = path.dirname(__filename);
 const DATA_DIR = path.join(__dirname, "..", "data");
 const APPOINTMENTS_FILE = path.join(DATA_DIR, "appointments.json");
 
-// Ensure data directory exists for local record keeping
+// Ensure data directory exists for local record keeping (skipped silently on Vercel)
 function ensureStorage() {
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
-  }
-  if (!fs.existsSync(APPOINTMENTS_FILE)) {
-    fs.writeFileSync(APPOINTMENTS_FILE, JSON.stringify([], null, 2), "utf-8");
+  try {
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+    }
+    if (!fs.existsSync(APPOINTMENTS_FILE)) {
+      fs.writeFileSync(APPOINTMENTS_FILE, JSON.stringify([], null, 2), "utf-8");
+    }
+  } catch (_) {
+    // Vercel has a read-only filesystem; local backup skipped in production
   }
 }
 
-// Get Google Webhook URL from process.env or agent/.env
+// Get Google Webhook URL from process.env (set in Vercel dashboard or .env locally)
 function getWebhookUrl() {
-  if (process.env.GOOGLE_WEBHOOK_URL) {
-    return process.env.GOOGLE_WEBHOOK_URL.trim();
-  }
-  try {
-    const agentEnvPath = path.join(__dirname, "..", "agent", ".env");
-    if (fs.existsSync(agentEnvPath)) {
-      const content = fs.readFileSync(agentEnvPath, "utf-8");
-      const match = content.match(/GOOGLE_WEBHOOK_URL=(.+)/);
-      if (match && match[1]) {
-        return match[1].trim();
-      }
-    }
-  } catch (_) {}
-  return null;
+  return process.env.GOOGLE_WEBHOOK_URL ? process.env.GOOGLE_WEBHOOK_URL.trim() : null;
 }
 
 /**

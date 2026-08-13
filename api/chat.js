@@ -1,27 +1,10 @@
 // Vercel serverless function: Groq LLM endpoint for Apex Medical Center Voice Assistant.
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { createAppointmentBooking } from "./booking.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Helper to get GROQ_API_KEY from process.env or agent/.env
+// Read GROQ_API_KEY from environment variables (set in Vercel dashboard or .env locally)
 function getGroqKey() {
-  if (process.env.GROQ_API_KEY && !process.env.GROQ_API_KEY.includes("your_")) {
-    return process.env.GROQ_API_KEY;
-  }
-  try {
-    const agentEnvPath = path.join(__dirname, "..", "agent", ".env");
-    if (fs.existsSync(agentEnvPath)) {
-      const content = fs.readFileSync(agentEnvPath, "utf-8");
-      const match = content.match(/GROQ_API_KEY=(.+)/);
-      if (match && match[1]) {
-        return match[1].trim();
-      }
-    }
-  } catch (_) {}
+  const key = process.env.GROQ_API_KEY || "";
+  if (key && !key.includes("your_")) return key;
   return null;
 }
 

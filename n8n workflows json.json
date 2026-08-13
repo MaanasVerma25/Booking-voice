@@ -1,0 +1,440 @@
+{
+  "name": "starforge2",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "user-response",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "6f412aa5-5da1-4feb-8c59-e909ba928631",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -96,
+        0
+      ],
+      "webhookId": "5dfc9476-7990-412b-a7aa-5d4f7ac97a15"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.SpeechResult || 'The call has just connected and the caller has not said anything yet. Greet them now.' }}",
+        "options": {
+          "systemMessage": "You are the polite, caring, and professional AI receptionist for Apex Healthcare Hospital, located in seector 14 vasundara gaziabad . Your job is to assist patients, triage their symptoms, suggest the right specialist, and book appointments over a phone call.\n\nHospital Doctor Roster: Neurologist (Brain/Nerves): Dr. Manas Verma Cardiologist (Heart/Chest): Dr. Anjali Sharma Orthopedics (Bones/Joints): Dr. Rajesh Iyer General Physician (Fever/Cough/General): Dr. Sunita Desai Gastroenterologist (Stomach/Digestion): Dr. Vikram Singh\n\nYour Instructions: Initial Greeting: If this is the very first message of the conversation, you MUST pick up the phone and say exactly: \"Thank you for calling Apex Healthcare Services. How may I assist you today?\" Be Empathetic: Always speak politely and show empathy for the patient's condition. Triage: Listen to their symptoms and advise them on which doctor from the roster they should see. Precautions: Offer 1 or 2 basic, safe medical precautions based on their symptoms (e.g., \"Please rest and stay hydrated,\" or \"Avoid lifting heavy objects\"). Remind them the doctor will provide a full diagnosis.\n\nCollect Details: Ask for the patient's name, phone number and book the appointment. Ask for these details naturally in the conversation.\n\nBook the Appointment: Once you have their details and have agreed on a realistic time (e.g., \"Tomorrow at 10:30 AM\"), you MUST use the append_appointment tool to save the appointment, and then the create_calendar_event tool to add it to the calendar. Only after the tools run successfully should you tell the patient their appointment is officially confirmed.\n\nENDING THE CALL (CRITICAL): When the appointment has been confirmed, or the patient says they need nothing further, you MUST end your final reply with this exact closing sentence: \"Thank you for calling Apex Healthcare Services. Your appointment is confirmed. Have a great day, goodbye.\" The word \"goodbye\" MUST be the very last word of your reply whenever the conversation is finished, because the phone system uses it to know when to hang up. Never say \"goodbye\" unless you truly intend to end the call.\n\nTOOL USAGE RULES (CRITICAL): When calling a tool, provide ONLY these argument names as a JSON object: patient_name, phone_number, doctor_speciality, appointment_time, notes. Do NOT invent other argument names. Do NOT include a status or payment field in the tool arguments. Always call append_appointment first, then create_calendar_event with the same arguments.\n\nCRITICAL RULE (Phone Call Format): You are speaking on a live phone call. Keep your responses short, conversational, and avoid long lists. Ask one question at a time to keep the conversation moving (e.g., \"Could you describe your symptoms?\", \"May I have your name to book this?\", or \"Is there anything else I can help with?\") UNTIL the appointment is confirmed. Be quick and do not waste the patient's time and DO NOT FORGET to ask their name and phone number. Always fill the sheet with the information you collected; if a detail is missing, use a reasonable placeholder. PLEASE keep the conversation short."
+        }
+      },
+      "id": "a4c81587-fbfe-4446-8deb-c7d2e229bb98",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        224,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "id": "44769257-f77a-4e55-98e2-6654a24879a9",
+      "name": "Groq Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        80,
+        336
+      ],
+      "credentials": {
+        "groqApi": {
+          "id": "kXH0OCVpd8C6RvAI",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Webhook').item.json.body.CallSid }}",
+        "contextWindowLength": 10
+      },
+      "id": "aa1b5d20-4e34-4a0f-8c7b-e80511a1c52b",
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        224,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this tool to save the appointment to the database ONLY when you are ready to finalize the booking. Before using this tool, converse with the patient to gather their name and phone number. Provide these arguments: patient_name, phone_number, doctor_speciality, appointment_time, notes. Do not trigger this tool until the patient has agreed to a specific date and time. ALWAYS record a row for each booking.",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1doPbeh65JmcR_0pRGfk4Al61D4Gmtdh54-tj8W1uC_I",
+          "mode": "list",
+          "cachedResultName": "appointments",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1doPbeh65JmcR_0pRGfk4Al61D4Gmtdh54-tj8W1uC_I/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1doPbeh65JmcR_0pRGfk4Al61D4Gmtdh54-tj8W1uC_I/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "TImestamp": "={{ $now }}",
+            "Patient Name": "={{ $fromAI('patient_name') }}",
+            "Phone Number": "={{ $fromAI('phone_number') }}",
+            "Doctor/Speciality": "={{ $fromAI('doctor_speciality') }}",
+            "Appointment Data and Time": "={{ $fromAI('appointment_time') }}",
+            "Payment method": "N/A",
+            "status": "success",
+            "Notes": "={{ $fromAI('notes') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "TImestamp",
+              "displayName": "TImestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Patient Name",
+              "displayName": "Patient Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Phone Number",
+              "displayName": "Phone Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Doctor/Speciality",
+              "displayName": "Doctor/Speciality",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Appointment Data and Time",
+              "displayName": "Appointment Data and Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Payment method",
+              "displayName": "Payment method",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Notes",
+              "displayName": "Notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "a284dfd4-32ea-4fd6-91f8-c6254aa949b5",
+      "name": "append_appointment",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        560,
+        192
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "2bOBOfUTGEdiq3An",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "pass74740@gmail.com",
+          "mode": "list",
+          "cachedResultName": "pass74740@gmail.com"
+        },
+        "additionalFields": {
+          "description": "=Phone: {{ $fromAI('phone_number') }} \\nNotes: {{ $fromAI('notes') }}",
+          "summary": "=Appointment with {{ $fromAI('patient_name') }} ({{ $fromAI('doctor_speciality') }})"
+        }
+      },
+      "id": "6656be5c-2f47-4a66-8cc4-80871150987d",
+      "name": "create_calendar_event",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        368,
+        336
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "YC10GIAuNt1LdmXQ",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://users.rime.ai/v1/rime-tts",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpTemplatedCustomAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "audio/wav"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  \"text\": $json.output,\n  \"modelId\": \"mistv3\",\n  \"speaker\": \"moon\",\n  \"samplingRate\": 8000,\n  \"audioFormat\": \"mulaw\"\n}) }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "203259b1-4c73-4ca2-bbf6-7e3ba8365e03",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        688,
+        -160
+      ],
+      "credentials": {
+        "httpTemplatedCustomAuth": {
+          "id": "UPzIYo5dimtuRJYP",
+          "name": "Rime TTS API (kartikeya T)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.cloudinary.com/v1_1/wmguzyvf/upload",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "upload_preset",
+              "value": "n8naudio"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "be234cb0-e152-449b-8d9a-402614fc2bba",
+      "name": "HTTP Request1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        992,
+        32
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response>\n  <Play>{{ $json.secure_url }}</Play>\n  {{ ($(\"AI Agent\").item.json.output || \"\").toLowerCase().includes(\"goodbye\") ? \"<Hangup/>\" : '<Gather input=\"speech\" action=\"https://kartikquant.app.n8n.cloud/webhook/user-response\" speechTimeout=\"auto\"></Gather>' }}\n</Response>",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "text/xml"
+              }
+            ]
+          }
+        }
+      },
+      "id": "d53bd2c4-d4cb-4a6a-8a97-4092dcb02a04",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1216,
+        -128
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "append_appointment": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "create_calendar_event": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "b4f6c43a-6206-4caa-8e88-262713faf51c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "52cc8a2c19e291da1f92bb3a0d817cb65dde2b821bf023445844ae0f0ec59cb5"
+  },
+  "nodeGroups": [],
+  "id": "oYPxAJqMcQ2z2HKT",
+  "tags": []
+}

@@ -889,6 +889,174 @@
   .profile-action-btn.danger { background: rgba(255, 59, 48, 0.08); color: var(--accent-red); border: 1px solid rgba(255, 59, 48, 0.2); }
   .profile-action-btn.danger:hover { background: var(--accent-red); color: #fff; }
 
+  /* ─── Prescription Details & Medical Reports Styles ─── */
+  .rx-auth-banner {
+    background: var(--bg-white); border: 1px solid var(--border-light);
+    border-radius: var(--radius-card); padding: 36px 32px;
+    display: flex; align-items: center; gap: 24px;
+    box-shadow: var(--shadow-sm);
+  }
+  .rx-auth-icon {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: #eef4fc; color: var(--accent-blue);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .rx-auth-icon svg { width: 28px; height: 28px; }
+  .rx-auth-text h4 { font-size: 1.2rem; font-weight: 600; margin-bottom: 4px; color: var(--text-primary); }
+  .rx-auth-text p { font-size: 0.9rem; color: var(--text-secondary); margin: 0; }
+  .rx-auth-btn {
+    margin-left: auto; padding: 12px 24px; border: none;
+    background: var(--accent-blue); color: #fff; font-weight: 600;
+    border-radius: var(--radius-pill); cursor: pointer; flex-shrink: 0;
+    transition: var(--transition); font-family: var(--font-stack);
+  }
+  .rx-auth-btn:hover { background: var(--accent-blue-hover); transform: translateY(-1px); }
+
+  .rx-grid-layout { display: grid; grid-template-columns: 360px 1fr; gap: 28px; align-items: start; }
+  .rx-card {
+    background: var(--bg-white); border: 1px solid var(--border-light);
+    border-radius: var(--radius-card); padding: 24px; box-shadow: var(--shadow-sm);
+  }
+  .rx-upload-card h3 {
+    font-size: 1.1rem; font-weight: 600; margin-bottom: 18px;
+    display: flex; align-items: center; gap: 10px; color: var(--text-primary);
+  }
+  .rx-upload-form { display: flex; flex-direction: column; gap: 16px; }
+
+  .rx-dropzone {
+    border: 2px dashed rgba(0, 102, 204, 0.3); border-radius: var(--radius-sm);
+    padding: 24px 16px; text-align: center; background: rgba(0, 102, 204, 0.02);
+    cursor: pointer; transition: var(--transition);
+  }
+  .rx-dropzone:hover, .rx-dropzone.dragover {
+    border-color: var(--accent-blue); background: rgba(0, 102, 204, 0.06);
+  }
+  .rx-dropzone-icon {
+    width: 42px; height: 42px; border-radius: 50%; background: #eef4fc;
+    color: var(--accent-blue); display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 10px;
+  }
+  .rx-dropzone-icon svg { width: 22px; height: 22px; }
+  .rx-dropzone-text { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4; }
+  .rx-dropzone-text strong { color: var(--accent-blue); font-weight: 600; }
+  .rx-dropzone-text span { display: block; font-size: 0.74rem; color: var(--text-tertiary); margin-top: 4px; }
+
+  .rx-file-preview-pill {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--bg-alt); border: 1px solid var(--border-light);
+    padding: 8px 12px; border-radius: 8px; font-size: 0.82rem; font-weight: 500;
+    color: var(--text-primary); margin-top: 10px;
+  }
+  .rx-file-preview-pill button {
+    background: transparent; border: none; color: var(--text-tertiary);
+    font-size: 1.1rem; cursor: pointer; padding: 0 4px;
+  }
+  .rx-file-preview-pill button:hover { color: var(--accent-red); }
+
+  .rx-field-group { display: flex; flex-direction: column; gap: 6px; }
+  .rx-field-group label { font-size: 0.78rem; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.5px; }
+  .rx-input {
+    width: 100%; padding: 10px 14px; background: var(--bg-alt);
+    border: 1px solid var(--border-light); border-radius: var(--radius-sm);
+    font-size: 0.9rem; color: var(--text-primary); outline: none;
+    font-family: var(--font-stack); transition: var(--transition);
+  }
+  .rx-input:focus { border-color: var(--accent-blue); background: #ffffff; }
+
+  .rx-submit-btn {
+    width: 100%; padding: 12px 0; border: none; background: var(--accent-blue);
+    color: #fff; font-weight: 600; font-size: 0.92rem; border-radius: var(--radius-pill);
+    cursor: pointer; transition: var(--transition); font-family: var(--font-stack);
+    box-shadow: 0 4px 12px rgba(0, 102, 204, 0.2); margin-top: 4px;
+  }
+  .rx-submit-btn:hover { background: var(--accent-blue-hover); }
+  .rx-submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .rx-library-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
+  }
+  .rx-filter-tabs {
+    display: flex; gap: 4px; background: var(--bg-white);
+    border: 1px solid var(--border-light); padding: 4px; border-radius: var(--radius-pill);
+  }
+  .rx-tab {
+    padding: 7px 16px; border: none; background: transparent;
+    font-size: 0.82rem; font-weight: 500; color: var(--text-secondary);
+    border-radius: var(--radius-pill); cursor: pointer; transition: var(--transition);
+    font-family: var(--font-stack);
+  }
+  .rx-tab.active { background: var(--accent-blue); color: #fff; font-weight: 600; }
+  .rx-count-badge { font-size: 0.82rem; font-weight: 600; color: var(--text-tertiary); }
+
+  .rx-records-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+  .rx-record-card {
+    background: var(--bg-white); border: 1px solid var(--border-light);
+    border-radius: var(--radius-card); padding: 18px; display: flex;
+    flex-direction: column; justify-content: space-between; gap: 14px;
+    box-shadow: var(--shadow-sm); transition: var(--transition);
+  }
+  .rx-record-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: rgba(0, 102, 204, 0.25); }
+
+  .rx-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+  .rx-badge {
+    font-size: 0.72rem; font-weight: 600; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.4px;
+  }
+  .rx-badge.prescription { background: rgba(0, 102, 204, 0.1); color: var(--accent-blue); }
+  .rx-badge.lab-report { background: rgba(175, 82, 222, 0.1); color: #8e24aa; }
+  .rx-badge.scan { background: rgba(255, 149, 0, 0.12); color: #d97706; }
+  .rx-badge.other { background: rgba(142, 142, 147, 0.12); color: var(--text-secondary); }
+
+  .rx-card-delete {
+    background: transparent; border: none; color: #b0b0b5;
+    font-size: 1rem; cursor: pointer; padding: 2px 6px; border-radius: 4px;
+    transition: var(--transition);
+  }
+  .rx-card-delete:hover { color: var(--accent-red); background: rgba(255, 59, 48, 0.08); }
+
+  .rx-card-info h4 { font-size: 0.95rem; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; line-height: 1.3; }
+  .rx-card-info p { font-size: 0.8rem; color: var(--text-secondary); margin: 0; line-height: 1.3; }
+  .rx-card-meta { font-size: 0.74rem; color: var(--text-tertiary); margin-top: 6px; display: flex; align-items: center; gap: 8px; }
+
+  .rx-card-actions { display: flex; gap: 8px; margin-top: 4px; }
+  .rx-btn {
+    flex: 1; padding: 8px 0; border: 1px solid var(--border-light);
+    background: var(--bg-alt); color: var(--text-primary); font-size: 0.8rem;
+    font-weight: 600; border-radius: var(--radius-pill); cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    transition: var(--transition); font-family: var(--font-stack); text-decoration: none;
+  }
+  .rx-btn:hover { background: #eef4fc; border-color: var(--accent-blue); color: var(--accent-blue); }
+
+  .rx-empty-state {
+    background: var(--bg-white); border: 1px dashed var(--border-light);
+    border-radius: var(--radius-card); padding: 48px 24px; text-align: center;
+  }
+  .rx-empty-icon {
+    width: 54px; height: 54px; border-radius: 50%; background: var(--bg-alt);
+    color: var(--text-tertiary); display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 14px;
+  }
+  .rx-empty-icon svg { width: 28px; height: 28px; }
+  .rx-empty-state h4 { font-size: 1.1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
+  .rx-empty-state p { font-size: 0.88rem; color: var(--text-secondary); max-width: 400px; margin: 0 auto; }
+
+  .rx-preview-modal { max-width: 720px; width: 90vw; padding: 28px; }
+  .rx-preview-header { margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid var(--border-light); }
+  .rx-preview-body {
+    min-height: 320px; max-height: 60vh; overflow-y: auto;
+    background: var(--bg-alt); border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: center; padding: 16px;
+  }
+  .rx-preview-body img { max-width: 100%; max-height: 55vh; border-radius: 8px; object-fit: contain; box-shadow: var(--shadow-sm); }
+  .rx-preview-body iframe { width: 100%; height: 55vh; border: none; border-radius: 8px; }
+  .rx-preview-footer { margin-top: 18px; display: flex; justify-content: flex-end; }
+
+  @media (max-width: 900px) {
+    .rx-grid-layout { grid-template-columns: 1fr; }
+  }
+
   @media (max-width: 868px) {
     .hero-container { grid-template-columns: 1fr; gap: 40px; }
     nav { display: none; }
@@ -912,6 +1080,7 @@
       </a>
 
       <nav>
+        <a href="#prescriptions">Prescriptions & Reports</a>
         <a href="#specialties">Doctors & Fees</a>
         <a href="#services">Diagnostics & Labs</a>
         <a href="#info">Clinic Information</a>
@@ -1232,7 +1401,139 @@
         </div>
       </div>
     </div>
+  <!-- Prescriptions & Medical Reports Section -->
+  <section class="section-alt" id="prescriptions">
+    <div class="container">
+      <div style="max-width: 680px; margin-bottom: 36px;">
+        <span class="status-pill" style="margin-bottom: 12px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Digital Vault
+        </span>
+        <h2>Prescription Details & Medical Reports</h2>
+        <p class="subhead">Upload, manage, and access all your doctor prescriptions, diagnostic lab reports, and imaging scans securely in one place connected to your account.</p>
+      </div>
+
+      <!-- Auth Banner when Logged Out -->
+      <div id="rxAuthBanner" class="rx-auth-banner" style="display: none;">
+        <div class="rx-auth-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="rx-auth-text">
+          <h4>Patient Sign-In Required</h4>
+          <p>Please sign in to your Apex account to securely upload and view your medical prescriptions and test reports.</p>
+        </div>
+        <button class="rx-auth-btn" id="rxSignInBtn">Sign In / Register</button>
+      </div>
+
+      <!-- Main Prescriptions Workspace (Visible when Logged In) -->
+      <div id="rxWorkspace" class="rx-workspace">
+        <div class="rx-grid-layout">
+          
+          <!-- Left Column: Upload Form -->
+          <div class="rx-card rx-upload-card">
+            <h3>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              Upload New Record
+            </h3>
+            
+            <form id="rxUploadForm" class="rx-upload-form">
+              <div class="rx-dropzone" id="rxDropzone">
+                <input type="file" id="rxFileInput" accept="image/*,application/pdf" style="display:none;" />
+                <div class="rx-dropzone-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M12 12v9"/><path d="m16 16-4-4-4 4"/></svg>
+                </div>
+                <div class="rx-dropzone-text" id="rxDropzonePrompt">
+                  <strong>Click to select file</strong> or drag & drop here
+                  <span>Supports PNG, JPG, WEBP, or PDF (Max 15MB)</span>
+                </div>
+                <div class="rx-file-preview-pill" id="rxFilePill" style="display:none;">
+                  <span id="rxFileName">filename.pdf</span>
+                  <button type="button" id="rxFileRemove">&times;</button>
+                </div>
+              </div>
+
+              <div class="rx-field-group">
+                <label for="rxCategory">Document Category</label>
+                <select id="rxCategory" class="rx-input">
+                  <option value="Prescription">Doctor Prescription</option>
+                  <option value="Lab Report">Diagnostic Lab Report</option>
+                  <option value="Scan / Imaging">Scan / X-Ray / MRI / USG</option>
+                  <option value="Other">Other Medical Document</option>
+                </select>
+              </div>
+
+              <div class="rx-field-group">
+                <label for="rxTitle">Document Title</label>
+                <input type="text" id="rxTitle" class="rx-input" placeholder="e.g. Dr. Sharma Prescription - Fever & Flu" required />
+              </div>
+
+              <div class="rx-field-group">
+                <label for="rxNotes">Doctor / Clinic Notes (Optional)</label>
+                <input type="text" id="rxNotes" class="rx-input" placeholder="e.g. Prescribed Paracetamol 500mg, 5 days course" />
+              </div>
+
+              <button type="submit" class="rx-submit-btn" id="rxSubmitBtn">
+                Upload & Store in Supabase
+              </button>
+            </form>
+          </div>
+
+          <!-- Right Column: Document Library & Filters -->
+          <div class="rx-library">
+            <div class="rx-library-header">
+              <div class="rx-filter-tabs">
+                <button class="rx-tab active" data-filter="all">All Records</button>
+                <button class="rx-tab" data-filter="Prescription">Prescriptions</button>
+                <button class="rx-tab" data-filter="Lab Report">Lab Reports</button>
+                <button class="rx-tab" data-filter="Scan / Imaging">Scans</button>
+              </div>
+              <span class="rx-count-badge" id="rxRecordCount">0 Documents</span>
+            </div>
+
+            <!-- Documents Grid -->
+            <div class="rx-records-grid" id="rxRecordsGrid">
+              <!-- Rendered dynamically -->
+            </div>
+
+            <!-- Empty State -->
+            <div class="rx-empty-state" id="rxEmptyState" style="display:none;">
+              <div class="rx-empty-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              </div>
+              <h4>No Medical Records Found</h4>
+              <p>Upload your first prescription or lab test report using the upload box on the left to store it safely in your patient vault.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
   </section>
+
+  <!-- Document Preview Modal -->
+  <div class="auth-overlay" id="docPreviewOverlay">
+    <div class="auth-modal rx-preview-modal">
+      <button class="auth-modal-close" id="docPreviewCloseBtn">&times;</button>
+      <div class="rx-preview-header">
+        <div>
+          <span class="rx-badge" id="previewCategory">Prescription</span>
+          <h3 id="previewTitle" style="font-size: 1.25rem; margin-top: 4px;">Document Preview</h3>
+          <span id="previewMeta" style="font-size: 0.78rem; color: var(--text-secondary);">Uploaded on Aug 13, 2026</span>
+        </div>
+      </div>
+
+      <div class="rx-preview-body" id="previewBody">
+        <!-- Render image preview or PDF iframe embed -->
+      </div>
+
+      <div class="rx-preview-footer">
+        <a id="previewDownloadBtn" class="rx-action-btn primary" download target="_blank" style="padding: 10px 20px; border-radius: 20px; background: var(--accent-blue); color: #fff; text-decoration: none; font-weight: 600; font-size: 0.88rem; display: inline-flex; align-items: center; gap: 8px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download Document
+        </a>
+      </div>
+    </div>
+  </div>
 
   <!-- Interactive Voice Modal -->
   <div class="call-overlay" id="callOverlay">
@@ -1352,7 +1653,11 @@
         </div>
       </div>
 
-      <div class="profile-actions">
+      <div class="profile-actions" style="flex-wrap: wrap;">
+        <button class="profile-action-btn primary" id="profileRxBtn" style="background: #eef4fc; color: var(--accent-blue); border: 1px solid rgba(0,102,204,0.2);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          My Prescriptions & Reports
+        </button>
         <button class="profile-action-btn primary" id="profileBookBtn">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
           Book Appointment
@@ -1870,6 +2175,7 @@
       headerSignInBtn.style.display = "";
       userBadge.classList.remove("visible");
     }
+    syncRxAuthUI();
   }
 
   headerSignOutBtn.addEventListener("click", async () => {
@@ -2011,6 +2317,428 @@
       authSubmitBtn.textContent = authMode === "signup" ? "Create Account" : "Sign In";
     }
   });
+
+  // ─── Prescriptions & Medical Reports Logic ───
+  let selectedRxFile = null;
+  let patientRecords = [];
+  let currentRxFilter = "all";
+
+  const rxAuthBanner = document.getElementById("rxAuthBanner");
+  const rxWorkspace = document.getElementById("rxWorkspace");
+  const rxSignInBtn = document.getElementById("rxSignInBtn");
+  const rxDropzone = document.getElementById("rxDropzone");
+  const rxFileInput = document.getElementById("rxFileInput");
+  const rxDropzonePrompt = document.getElementById("rxDropzonePrompt");
+  const rxFilePill = document.getElementById("rxFilePill");
+  const rxFileName = document.getElementById("rxFileName");
+  const rxFileRemove = document.getElementById("rxFileRemove");
+  const rxUploadForm = document.getElementById("rxUploadForm");
+  const rxCategory = document.getElementById("rxCategory");
+  const rxTitle = document.getElementById("rxTitle");
+  const rxNotes = document.getElementById("rxNotes");
+  const rxSubmitBtn = document.getElementById("rxSubmitBtn");
+  const rxRecordsGrid = document.getElementById("rxRecordsGrid");
+  const rxRecordCount = document.getElementById("rxRecordCount");
+  const rxEmptyState = document.getElementById("rxEmptyState");
+  const docPreviewOverlay = document.getElementById("docPreviewOverlay");
+  const docPreviewCloseBtn = document.getElementById("docPreviewCloseBtn");
+  const previewCategory = document.getElementById("previewCategory");
+  const previewTitle = document.getElementById("previewTitle");
+  const previewMeta = document.getElementById("previewMeta");
+  const previewBody = document.getElementById("previewBody");
+  const previewDownloadBtn = document.getElementById("previewDownloadBtn");
+
+  if (rxSignInBtn) rxSignInBtn.addEventListener("click", openAuthModal);
+
+  const profileRxBtn = document.getElementById("profileRxBtn");
+  if (profileRxBtn) {
+    profileRxBtn.addEventListener("click", () => {
+      closeProfileModal();
+      const rxSection = document.getElementById("prescriptions");
+      if (rxSection) rxSection.scrollIntoView({ behavior: "smooth" });
+    });
+  }
+
+  function syncRxAuthUI() {
+    if (currentUser) {
+      if (rxAuthBanner) rxAuthBanner.style.display = "none";
+      if (rxWorkspace) rxWorkspace.style.display = "block";
+      loadPatientRecords();
+    } else {
+      if (rxAuthBanner) rxAuthBanner.style.display = "flex";
+      if (rxWorkspace) rxWorkspace.style.display = "none";
+      patientRecords = [];
+    }
+  }
+
+  // Drag & drop file handling
+  if (rxDropzone) {
+    rxDropzone.addEventListener("click", (e) => {
+      if (e.target !== rxFileRemove && (!rxFileRemove || !rxFileRemove.contains(e.target))) {
+        rxFileInput.click();
+      }
+    });
+
+    ["dragenter", "dragover"].forEach(eventName => {
+      rxDropzone.addEventListener(eventName, (e) => {
+        e.preventDefault(); e.stopPropagation();
+        rxDropzone.classList.add("dragover");
+      });
+    });
+    ["dragleave", "drop"].forEach(eventName => {
+      rxDropzone.addEventListener(eventName, (e) => {
+        e.preventDefault(); e.stopPropagation();
+        rxDropzone.classList.remove("dragover");
+      });
+    });
+
+    rxDropzone.addEventListener("drop", (e) => {
+      const files = e.dataTransfer.files;
+      if (files && files.length > 0) {
+        setSelectedRxFile(files[0]);
+      }
+    });
+  }
+
+  if (rxFileInput) {
+    rxFileInput.addEventListener("change", (e) => {
+      if (e.target.files && e.target.files.length > 0) {
+        setSelectedRxFile(e.target.files[0]);
+      }
+    });
+  }
+
+  if (rxFileRemove) {
+    rxFileRemove.addEventListener("click", (e) => {
+      e.stopPropagation();
+      setSelectedRxFile(null);
+    });
+  }
+
+  function setSelectedRxFile(file) {
+    selectedRxFile = file;
+    if (file) {
+      if (rxDropzonePrompt) rxDropzonePrompt.style.display = "none";
+      if (rxFilePill) rxFilePill.style.display = "flex";
+      if (rxFileName) rxFileName.textContent = file.name + " (" + formatBytes(file.size) + ")";
+      if (rxTitle && !rxTitle.value) {
+        let nameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
+        rxTitle.value = nameWithoutExt.replace(/[-_]/g, " ");
+      }
+    } else {
+      if (rxFileInput) rxFileInput.value = "";
+      if (rxDropzonePrompt) rxDropzonePrompt.style.display = "block";
+      if (rxFilePill) rxFilePill.style.display = "none";
+    }
+  }
+
+  function formatBytes(bytes) {
+    if (!bytes || bytes === 0) return "0 B";
+    const k = 1024;
+    const sizes = ["B", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
+  }
+
+  // Filter tabs
+  const rxFilterTabs = document.querySelectorAll(".rx-filter-tabs .rx-tab");
+  rxFilterTabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      rxFilterTabs.forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+      currentRxFilter = tab.getAttribute("data-filter") || "all";
+      renderPatientRecords();
+    });
+  });
+
+  async function loadPatientRecords() {
+    if (!currentUser) return;
+    patientRecords = [];
+
+    // 1. Try Supabase Table Fetch
+    if (supabaseClient) {
+      try {
+        const { data, error } = await supabaseClient
+          .from("medical_records")
+          .select("*")
+          .eq("user_id", currentUser.id)
+          .order("created_at", { ascending: false });
+
+        if (!error && Array.isArray(data)) {
+          patientRecords = data;
+        }
+      } catch (err) {
+        console.warn("Supabase medical_records fetch skipped:", err);
+      }
+    }
+
+    // 2. Local Storage Fallback
+    try {
+      const localKey = "apex_medical_records_" + currentUser.id;
+      const stored = localStorage.getItem(localKey);
+      if (stored) {
+        const localList = JSON.parse(stored);
+        if (Array.isArray(localList)) {
+          localList.forEach(rec => {
+            if (!patientRecords.some(r => r.id === rec.id)) {
+              patientRecords.push(rec);
+            }
+          });
+        }
+      }
+    } catch (_) {}
+
+    renderPatientRecords();
+  }
+
+  function saveLocalPatientRecords() {
+    if (!currentUser) return;
+    try {
+      const localKey = "apex_medical_records_" + currentUser.id;
+      localStorage.setItem(localKey, JSON.stringify(patientRecords));
+    } catch (_) {}
+  }
+
+  function renderPatientRecords() {
+    if (!rxRecordsGrid) return;
+    rxRecordsGrid.innerHTML = "";
+
+    const filtered = patientRecords.filter(r => {
+      if (currentRxFilter === "all") return true;
+      return (r.category || "").toLowerCase() === currentRxFilter.toLowerCase();
+    });
+
+    if (rxRecordCount) rxRecordCount.textContent = filtered.length + (filtered.length === 1 ? " Document" : " Documents");
+
+    if (filtered.length === 0) {
+      if (rxEmptyState) rxEmptyState.style.display = "block";
+      return;
+    }
+
+    if (rxEmptyState) rxEmptyState.style.display = "none";
+
+    filtered.forEach(rec => {
+      const card = document.createElement("div");
+      card.className = "rx-record-card";
+
+      let catClass = "other";
+      let catLower = (rec.category || "").toLowerCase();
+      if (catLower.includes("prescription")) catClass = "prescription";
+      else if (catLower.includes("lab")) catClass = "lab-report";
+      else if (catLower.includes("scan") || catLower.includes("imaging")) catClass = "scan";
+
+      const createdDate = rec.created_at ? new Date(rec.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "Recent";
+      const sizeStr = formatBytes(rec.file_size || 0);
+
+      card.innerHTML = `
+        <div class="rx-card-top">
+          <span class="rx-badge ${catClass}">${escapeHtml(rec.category || "Document")}</span>
+          <button class="rx-card-delete" title="Delete document" data-id="${rec.id}">&times;</button>
+        </div>
+        <div class="rx-card-info">
+          <h4>${escapeHtml(rec.title || rec.file_name || "Medical Document")}</h4>
+          ${rec.doctor_notes ? `<p>${escapeHtml(rec.doctor_notes)}</p>` : ""}
+          <div class="rx-card-meta">
+            <span>📅 ${createdDate}</span>
+            <span>•</span>
+            <span>📎 ${sizeStr}</span>
+          </div>
+        </div>
+        <div class="rx-card-actions">
+          <button class="rx-btn rx-preview-btn" data-id="${rec.id}">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            Preview
+          </button>
+          <a href="${rec.file_url}" target="_blank" download="${escapeHtml(rec.file_name)}" class="rx-btn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download
+          </a>
+        </div>
+      `;
+
+      card.querySelector(".rx-card-delete").addEventListener("click", () => deletePatientRecord(rec.id));
+      card.querySelector(".rx-preview-btn").addEventListener("click", () => previewDocument(rec));
+
+      rxRecordsGrid.appendChild(card);
+    });
+  }
+
+  function escapeHtml(str) {
+    if (!str) return "";
+    return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+
+  // Upload Form Submission
+  if (rxUploadForm) {
+    rxUploadForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!currentUser) {
+        openAuthModal();
+        return;
+      }
+      if (!selectedRxFile) {
+        alert("Please select a prescription or medical report file to upload.");
+        return;
+      }
+
+      const title = rxTitle.value.trim();
+      const category = rxCategory.value;
+      const notes = rxNotes.value.trim();
+
+      if (!title) {
+        alert("Please enter a document title.");
+        return;
+      }
+
+      rxSubmitBtn.disabled = true;
+      rxSubmitBtn.textContent = "Uploading to Supabase...";
+
+      try {
+        let fileUrl = "";
+        let filePath = "";
+
+        // Read file as Base64 Data URL for instant rendering & local fallback
+        const base64Url = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (ev) => resolve(ev.target.result);
+          reader.readAsDataURL(selectedRxFile);
+        });
+
+        fileUrl = base64Url;
+
+        // 1. Try Supabase Storage Upload
+        if (supabaseClient) {
+          try {
+            const path = currentUser.id + "/" + Date.now() + "_" + selectedRxFile.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+            const { data: storageData, error: storageErr } = await supabaseClient.storage
+              .from("prescriptions")
+              .upload(path, selectedRxFile, { upsert: true });
+
+            if (!storageErr && storageData) {
+              filePath = storageData.path;
+              const { data: pubData } = supabaseClient.storage.from("prescriptions").getPublicUrl(path);
+              if (pubData && pubData.publicUrl) {
+                fileUrl = pubData.publicUrl;
+              }
+            }
+          } catch (err) {
+            console.warn("Supabase storage upload skipped:", err);
+          }
+        }
+
+        const newRecord = {
+          id: "REC-" + Date.now(),
+          user_id: currentUser.id,
+          title: title,
+          category: category,
+          doctor_notes: notes,
+          file_name: selectedRxFile.name,
+          file_path: filePath,
+          file_url: fileUrl,
+          file_size: selectedRxFile.size,
+          file_type: selectedRxFile.type,
+          created_at: new Date().toISOString()
+        };
+
+        // 2. Insert into Supabase Database
+        if (supabaseClient) {
+          try {
+            const { data: dbData, error: dbErr } = await supabaseClient
+              .from("medical_records")
+              .insert([{
+                user_id: newRecord.user_id,
+                title: newRecord.title,
+                category: newRecord.category,
+                doctor_notes: newRecord.doctor_notes,
+                file_name: newRecord.file_name,
+                file_path: newRecord.file_path,
+                file_url: newRecord.file_url,
+                file_size: newRecord.file_size,
+                file_type: newRecord.file_type
+              }])
+              .select();
+
+            if (!dbErr && Array.isArray(dbData) && dbData[0]) {
+              newRecord.id = dbData[0].id;
+            }
+          } catch (err) {
+            console.warn("Supabase table insert skipped:", err);
+          }
+        }
+
+        patientRecords.unshift(newRecord);
+        saveLocalPatientRecords();
+        renderPatientRecords();
+
+        // Reset form
+        rxUploadForm.reset();
+        setSelectedRxFile(null);
+        alert("Success! Your medical record has been uploaded and stored securely.");
+
+      } catch (err) {
+        console.error("Error uploading medical record:", err);
+        alert("Failed to upload document. Please try again.");
+      } finally {
+        rxSubmitBtn.disabled = false;
+        rxSubmitBtn.textContent = "Upload & Store in Supabase";
+      }
+    });
+  }
+
+  async function deletePatientRecord(recordId) {
+    if (!confirm("Are you sure you want to delete this medical record?")) return;
+
+    // Delete from state & local storage
+    const targetRec = patientRecords.find(r => r.id === recordId);
+    patientRecords = patientRecords.filter(r => r.id !== recordId);
+    saveLocalPatientRecords();
+    renderPatientRecords();
+
+    // Delete from Supabase Database
+    if (supabaseClient && targetRec) {
+      try {
+        await supabaseClient.from("medical_records").delete().eq("id", recordId);
+        if (targetRec.file_path) {
+          await supabaseClient.storage.from("prescriptions").remove([targetRec.file_path]);
+        }
+      } catch (err) {
+        console.warn("Supabase record delete skipped:", err);
+      }
+    }
+  }
+
+  function previewDocument(rec) {
+    if (!docPreviewOverlay || !rec) return;
+
+    if (previewTitle) previewTitle.textContent = rec.title || rec.file_name;
+    if (previewCategory) {
+      previewCategory.textContent = rec.category || "Document";
+      previewCategory.className = "rx-badge " + (rec.category || "").toLowerCase().replace(/[^a-z]/g, "-");
+    }
+    if (previewMeta) {
+      const d = rec.created_at ? new Date(rec.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "";
+      previewMeta.textContent = "Uploaded on " + d + " • " + formatBytes(rec.file_size || 0);
+    }
+    if (previewDownloadBtn) {
+      previewDownloadBtn.href = rec.file_url;
+      previewDownloadBtn.setAttribute("download", rec.file_name || "prescription");
+    }
+
+    if (previewBody) {
+      previewBody.innerHTML = "";
+      const type = (rec.file_type || "").toLowerCase();
+      if (type.includes("pdf") || (rec.file_url || "").startsWith("data:application/pdf")) {
+        previewBody.innerHTML = `<iframe src="${rec.file_url}"></iframe>`;
+      } else {
+        previewBody.innerHTML = `<img src="${rec.file_url}" alt="${escapeHtml(rec.title)}" />`;
+      }
+    }
+
+    docPreviewOverlay.classList.add("active");
+  }
+
+  if (docPreviewCloseBtn) docPreviewCloseBtn.addEventListener("click", () => docPreviewOverlay.classList.remove("active"));
+  if (docPreviewOverlay) docPreviewOverlay.addEventListener("click", (e) => { if (e.target === docPreviewOverlay) docPreviewOverlay.classList.remove("active"); });
 
   // Initialize Supabase on page load
   (async function initSupabase() {

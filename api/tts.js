@@ -1,26 +1,8 @@
 // Serverless API endpoint: Rime Coda TTS for Apex Healthcare Voice Assistant.
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 function getRimeApiKey() {
-  if (process.env.RIME_API_KEY && !process.env.RIME_API_KEY.includes("your_")) {
-    return process.env.RIME_API_KEY;
-  }
-  try {
-    const agentEnvPath = path.join(__dirname, "..", "agent", ".env");
-    if (fs.existsSync(agentEnvPath)) {
-      const content = fs.readFileSync(agentEnvPath, "utf-8");
-      const match = content.match(/RIME_API_KEY=(.+)/);
-      if (match && match[1]) {
-        return match[1].trim();
-      }
-    }
-  } catch (_) {}
-  return "bPFL4RCx9rS9U4q5v2DTExBnpIFYHfXnTIYRf2h2IYQ";
+  // Read from Vercel / local env vars. Falls back to bundled key for local dev.
+  return process.env.RIME_API_KEY || "bPFL4RCx9rS9U4q5v2DTExBnpIFYHfXnTIYRf2h2IYQ";
 }
 
 export default async function handler(req, res) {

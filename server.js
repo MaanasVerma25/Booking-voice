@@ -50,6 +50,15 @@ const MIME_TYPES = {
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
 
+  // Serve Supabase public config to the browser (GET only, no secrets exposed)
+  if (url.pathname === "/api/config" && req.method === "GET") {
+    res.writeHead(200, { "Content-Type": "application/json" });
+    return res.end(JSON.stringify({
+      supabaseUrl: (process.env.SUPABASE_URL || "").replace(/\/rest\/v1\/?$/, ""),
+      supabaseAnonKey: process.env.SUPABASE_ANON_KEY || ""
+    }));
+  }
+
   if (url.pathname === "/api/token" || url.pathname === "/api/chat" || url.pathname === "/api/tts" || url.pathname === "/api/book-appointment") {
     let body = "";
     req.on("data", chunk => { body += chunk; });

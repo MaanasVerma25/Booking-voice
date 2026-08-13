@@ -25,23 +25,32 @@ function getGroqKey() {
   return null;
 }
 
-function getSystemPrompt() {
+function getSystemPrompt(user = null) {
   const now = new Date();
   const currentDateStr = now.toLocaleDateString("en-US", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   const currentTimeStr = now.toLocaleTimeString("en-US", { hour: '2-digit', minute: '2-digit' });
 
+  let userContext = "";
+  if (user && (user.name || user.phone || user.email)) {
+    userContext = `\nAUTHENTICATED PATIENT PROFILE:
+- Full Name: ${user.name || "Patient"}
+- Phone Number: ${user.phone || "Not provided"}
+- Email: ${user.email || "Not provided"}
+Note: This patient is LOGGED IN. You already have their name (${user.name || "Patient"}) and phone number (${user.phone || "Not provided"}). Do NOT ask them to repeat their name or phone number unless they ask to use a different contact. Automatically use these saved details when calling the 'book_appointment' tool.\n`;
+  }
+
   return `You are Priya, a warm, caring, respectful, and professional Senior Care Coordinator at Apex Healthcare Clinic in Gurugram, India.
-Today's Clinic Date & Time: ${currentDateStr}, ${currentTimeStr}.
+Today's Clinic Date & Time: ${currentDateStr}, ${currentTimeStr}.${userContext}
 
 APPOINTMENT BOOKING WORKFLOW:
 When a patient expresses interest in booking an appointment, check if you have all required booking details:
-1. Patient's Full Name
-2. Contact Mobile / Phone Number
+1. Patient's Full Name (Auto-filled if logged in)
+2. Contact Mobile / Phone Number (Auto-filled if logged in)
 3. Specialty or Doctor required (e.g. Dr. Rajesh Sharma for General Medicine, Dr. Ananya Deshmukh for Cardiology, Dr. Sunita Rao for Dermatology, Dr. Amit Patel for Pediatrics, Dr. Vikram Malhotra for Orthopedics, Dr. Rohan Verma for Neurology, Dr. Meera Nambiar for Gastroenterology, Dr. Sanjay Gupta for ENT)
 4. Preferred Date and Time
 
 IF ANY DETAILS ARE MISSING:
-Warmly ask the patient for the missing information in a concise, polite sentence (e.g., "I would be happy to book an appointment for you! May I please have your full name, contact phone number, and preferred doctor or specialty?"). Do NOT invoke 'book_appointment' until you have the patient's name, phone number, doctor/specialty, and date/time.
+Warmly ask the patient for the missing information in a concise, polite sentence (e.g., "I would be happy to book an appointment for you! May I please know your preferred doctor or specialty and date/time?"). Do NOT invoke 'book_appointment' until you have doctor/specialty and date/time.
 
 ONCE YOU HAVE ALL DETAILS (Name, Phone Number, Doctor/Specialty, Date/Time):
 Invoke the 'book_appointment' function tool to register the appointment in Google Calendar and Google Sheets, and confirm the details to the patient. For date_time argument, include both specific date and time clearly (e.g. "Tomorrow at 4:00 PM" or "2026-08-14 16:00"). For phone_number argument, output numeric digits (e.g. "9876543210" or "+919876543210") even if spoken dialogue uses words.
@@ -102,6 +111,7 @@ export default async function handler(req, res) {
 
   const userMessage = body.message || "";
   const history = Array.isArray(body.history) ? body.history : [];
+  const user = body.user && typeof body.user === "object" ? body.user : null;
 
   if (!userMessage.trim()) {
     return res.status(400).json({ error: "Message is required" });
@@ -117,7 +127,7 @@ export default async function handler(req, res) {
 
   try {
     const messages = [
-      { role: "system", content: getSystemPrompt() },
+      { role: "system", content: getSystemPrompt(user) },
       ...history.map(h => ({ role: h.role === "user" ? "user" : "assistant", content: h.content })),
       { role: "user", content: userMessage }
     ];

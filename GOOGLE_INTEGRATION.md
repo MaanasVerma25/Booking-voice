@@ -34,6 +34,7 @@ function doPost(e) {
     var phone = data.phone_number || data.phone || "Not provided";
     var doctor = data.doctor_or_specialty || data.doctor || "General Consultation";
     var dateTimeStr = data.date_time || data.dateTime || "As requested";
+    var isoDateTime = data.iso_date_time || null;
     var insurance = data.insurance_details || data.insurance || "Self-pay / N/A";
     var notes = data.notes || "Booked via Apex Voice Assistant";
     var timestamp = new Date();
@@ -55,16 +56,8 @@ function doPost(e) {
     var calendar = CalendarApp.getDefaultCalendar();
     var eventTitle = "Medical Appointment: " + patientName + " (" + doctor + ")";
 
-    // Parse start time (or default to tomorrow 10 AM if parsing is flexible)
-    var startTime = new Date();
-    startTime.setDate(startTime.getDate() + 1);
-    startTime.setHours(10, 0, 0, 0);
-
-    var parsed = Date.parse(dateTimeStr);
-    if (!isNaN(parsed)) {
-      startTime = new Date(parsed);
-    }
-
+    // Parse start time accurately using ISO timestamp or smart relative parser
+    var startTime = parseAppointmentDateTime(dateTimeStr, isoDateTime);
     var endTime = new Date(startTime.getTime() + 30 * 60 * 1000); // 30 minutes duration
 
     var description = "Patient Name: " + patientName + "\n" +
@@ -80,7 +73,8 @@ function doPost(e) {
 
     return ContentService.createTextOutput(JSON.stringify({
       status: "success",
-      message: "Appointment saved to Calendar & Sheet"
+      message: "Appointment saved to Calendar & Sheet",
+      scheduledTime: startTime.toString()
     })).setMimeType(ContentService.MimeType.JSON);
 
   } catch (err) {
@@ -89,6 +83,79 @@ function doPost(e) {
       error: err.toString()
     })).setMimeType(ContentService.MimeType.JSON);
   }
+}
+
+/**
+ * Intelligent date and time parser for Google Apps Script
+ */
+function parseAppointmentDateTime(dateTimeStr, isoDateTime) {
+  // 1. If pre-formatted ISO timestamp is passed from backend, use it
+  if (isoDateTime) {
+    var pIso = Date.parse(isoDateTime);
+    if (!isNaN(pIso)) {
+      return new Date(pIso);
+    }
+  }
+
+  // 2. Try standard Date.parse
+  if (dateTimeStr) {
+    var pStr = Date.parse(dateTimeStr);
+    if (!isNaN(pStr)) {
+      var d = new Date(pStr);
+      if (d.getFullYear() > 2000) return d;
+    }
+  }
+
+  // 3. Natural language fallback parser for relative dates & times
+  var rawStr = String(dateTimeStr || "").trim();
+  var lower = rawStr.toLowerCase();
+  var now = new Date();
+  var targetDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 10, 0, 0, 0);
+
+  if (lower.indexOf("day after tomorrow") !== -1) {
+    targetDate.setDate(now.getDate() + 2);
+  } else if (lower.indexOf("tomorrow") !== -1) {
+    targetDate.setDate(now.getDate() + 1);
+  } else if (lower.indexOf("today") !== -1) {
+    targetDate.setDate(now.getDate());
+  } else {
+    var days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+    for (var i = 0; i < days.length; i++) {
+      if (lower.indexOf(days[i]) !== -1) {
+        var currentDay = now.getDay();
+        var diff = i - currentDay;
+        if (diff <= 0) diff += 7;
+        targetDate.setDate(now.getDate() + diff);
+        break;
+      }
+    }
+  }
+
+  // Convert spelled numbers to digits for common hours (e.g. "four PM" -> "4 PM")
+  var wordMap = {
+    "one": "1", "two": "2", "three": "3", "four": "4", "five": "5",
+    "six": "6", "seven": "7", "eight": "8", "nine": "9", "ten": "10",
+    "eleven": "11", "twelve": "12"
+  };
+  var timeStr = lower;
+  for (var key in wordMap) {
+    timeStr = timeStr.replace(new RegExp("\\b" + key + "\\b", "g"), wordMap[key]);
+  }
+
+  var timeMatch = timeStr.match(/(\d{1,2})(?::(\d{2}))?\s*(am|pm)?/i);
+  if (timeMatch) {
+    var hours = parseInt(timeMatch[1], 10);
+    var minutes = timeMatch[2] ? parseInt(timeMatch[2], 10) : 0;
+    var ampm = timeMatch[3] ? timeMatch[3].toLowerCase() : null;
+
+    if (ampm === "pm" && hours < 12) hours += 12;
+    if (ampm === "am" && hours === 12) hours = 0;
+    if (!ampm && hours >= 1 && hours <= 7) hours += 12;
+
+    targetDate.setHours(hours, minutes, 0, 0);
+  }
+
+  return targetDate;
 }
 ```
 

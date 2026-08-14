@@ -141,6 +141,10 @@ graph TB
     style GOOGLE fill:#0D1524,stroke:#34A853,color:#F1F5F9
     style STORAGE fill:#0D1524,stroke:#F59E0B,color:#F1F5F9
 ```
+
+https://github.com/user-attachments/assets/5374b36b-fba3-4e1b-acc5-45e07b608885
+
+
 # n8n-workflow-starforge
 <div align="center">
   
@@ -156,6 +160,11 @@ graph TB
 
 ---
 </div>
+
+
+
+
+
 
 ##  Overview
 

@@ -806,6 +806,17 @@ In mock demo mode, type the same booking request in the chat interface. The Groq
 
 ---
 
+##  Credits & Acknowledgments
+
+A special shout-out and heartfelt thanks to our partners for powering this project:
+
+- **Pathway** — Mentorship and guidance by Pathway judges
+- **Rime** — Ultra-fast, expressive Rime Coda voice synthesis (TTS)
+- **Weya** — AI innovation platform and support
+- **Qdrant** — Vector database for high-speed semantic search & memory retrieval
+
+---
+
 ##  Contributing
 
 1. Fork the repository

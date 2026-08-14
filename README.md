@@ -28,7 +28,7 @@
 
 ---
 
-A full-stack **AI voice agent** that powers appointment booking at Apex Healthcare Clinic (Gurugram, India). Visitors call **"Priya,"** the AI Senior Care Coordinator, via a premium dark-themed web UI. Under the hood, a real-time pipeline connects **Deepgram STT → Groq Llama 3.3 LLM (context provided by Quadrant Vector DB) → Rime Coda TTS** with push-to-talk and preemptive speech generation. Bookings are **automatically synced to Google Calendar and Google Sheets** via a Google Apps Script webhook.
+A full-stack **AI voice agent** that powers appointment booking at Apex Healthcare Clinic (Gurugram, India). Visitors call **"Priya,"** the AI Senior Care Coordinator, via a premium dark-themed web UI. Under the hood, a real-time pipeline connects **Deepgram STT → Groq Llama 3.3 LLM (context provided by Qdrant Vector DB) → Rime Coda TTS** with push-to-talk and preemptive speech generation. Bookings are **automatically synced to Google Calendar and Google Sheets** via a Google Apps Script webhook. All features — including appointments, lab reports, prescriptions, and medical records — are unified in one place.
 
 > **Demo Mode Built-In** — The app runs a fully functional mock demo when LiveKit credentials aren't configured, using the Web Speech API for voice I/O and the Groq Chat API for intelligent responses.
 
@@ -50,6 +50,8 @@ https://github.com/user-attachments/assets/acbdf94d-e796-46b2-8f7a-7f1bd4d84168
 | 🔇 **Noise Cancellation** | LiveKit BVC noise cancellation for clean audio in any environment |
 | 📅 **Google Calendar Sync** | Appointments auto-create Google Calendar events via Apps Script webhook |
 | 📊 **Google Sheets Logging** | Every booking is logged in a structured Google Sheet with patient details |
+| 🏥 **Unified Health Hub** | All features — appointments, lab reports, prescriptions, and medical records in one place |
+| 🔍 **Vector Memory (Qdrant)** | Fast semantic context & retrieval for clinical notes and patient history |
 | 🛠️ **LLM Function Calling** | Groq Llama 3.3 auto-invokes `book_appointment` tool when all details are collected |
 | 💾 **Local JSON Backup** | All bookings persisted to `data/appointments.json` as failsafe |
 | 🎨 **Premium UI** | Glassmorphic dark theme with Inter/Outfit typography, gradient CTAs, and micro-animations |

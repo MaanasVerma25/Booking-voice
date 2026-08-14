@@ -28,7 +28,7 @@
 
 ---
 
-A full-stack **AI voice agent** that powers appointment booking at Apex Healthcare Clinic (Gurugram, India). Visitors call **"Priya,"** the AI Senior Care Coordinator, via a premium dark-themed web UI. Under the hood, a LiveKit real-time pipeline connects **Deepgram STT → Groq Llama 3.3 LLM → Rime Coda TTS** with push-to-talk and preemptive speech generation. Bookings are **automatically synced to Google Calendar and Google Sheets** via a Google Apps Script webhook.
+A full-stack **AI voice agent** that powers appointment booking at Apex Healthcare Clinic (Gurugram, India). Visitors call **"Priya,"** the AI Senior Care Coordinator, via a premium dark-themed web UI. Under the hood, a real-time pipeline connects **Deepgram STT → Groq Llama 3.3 LLM (context provided by Quadrant Vector DB) → Rime Coda TTS** with push-to-talk and preemptive speech generation. Bookings are **automatically synced to Google Calendar and Google Sheets** via a Google Apps Script webhook.
 
 > **Demo Mode Built-In** — The app runs a fully functional mock demo when LiveKit credentials aren't configured, using the Web Speech API for voice I/O and the Groq Chat API for intelligent responses.
 

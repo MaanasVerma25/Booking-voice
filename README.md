@@ -176,7 +176,7 @@ What makes this agent powerful is its ability to take action: during a call, it 
 
 > **Note:** This is the visual representation of our n8n automation flow.
 
-*(Delete this text and drag your image here)*
+<img width="1600" height="738" alt="n8n workflow" src="https://github.com/user-attachments/assets/11323d8d-66b8-45b0-a116-ad81614f8942" />
 
 ## ⚙️ The Tech Stack
 

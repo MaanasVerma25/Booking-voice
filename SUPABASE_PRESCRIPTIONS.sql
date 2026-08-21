@@ -25,14 +25,22 @@ CREATE TABLE IF NOT EXISTS public.medical_records (
 ALTER TABLE public.medical_records ENABLE ROW LEVEL SECURITY;
 
 -- 3. RLS Policies: Allow patients to view, insert, and delete ONLY their own records
+DROP POLICY IF EXISTS "Patients can view own medical records" ON public.medical_records;
 CREATE POLICY "Patients can view own medical records"
   ON public.medical_records FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Allow select for voice agent and n8n lookup" ON public.medical_records;
+CREATE POLICY "Allow select for voice agent and n8n lookup"
+  ON public.medical_records FOR SELECT
+  USING (true);
+
+DROP POLICY IF EXISTS "Patients can upload own medical records" ON public.medical_records;
 CREATE POLICY "Patients can upload own medical records"
   ON public.medical_records FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Patients can delete own medical records" ON public.medical_records;
 CREATE POLICY "Patients can delete own medical records"
   ON public.medical_records FOR DELETE
   USING (auth.uid() = user_id);

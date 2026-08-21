@@ -1,5 +1,5 @@
-// Vercel serverless function: Groq LLM endpoint for Apex Medical Center Voice Assistant.
 import { createAppointmentBooking } from "./booking.js";
+import { searchQdrantRecords, indexRecordInQdrant } from "./qdrant.js";
 
 // Read GROQ_API_KEY from environment variables (set in Vercel dashboard or .env locally)
 function getGroqKey() {
@@ -8,18 +8,76 @@ function getGroqKey() {
   return null;
 }
 
-function getSystemPrompt(user = null, records = []) {
+// Supabase REST helper: Lookup patient profile & past medical records by 2-digit Patient Number (< 3 digits)
+export async function lookupPatientByNumber(patientNo) {
+  const supabaseUrl = (process.env.SUPABASE_URL || "").replace(/\/rest\/v1\/?$/, "");
+  const supabaseKey = process.env.SUPABASE_ANON_KEY || "";
+
+  if (!supabaseUrl || !supabaseKey || !patientNo) return null;
+
+  try {
+    const pNum = parseInt(String(patientNo).replace(/\D/g, ""), 10);
+    if (isNaN(pNum)) return null;
+
+    // 1. Query public.profiles table by patient_no
+    const profResp = await fetch(`${supabaseUrl}/rest/v1/profiles?patient_no=eq.${pNum}&select=*`, {
+      headers: {
+        "apikey": supabaseKey,
+        "Authorization": `Bearer ${supabaseKey}`
+      }
+    });
+
+    if (!profResp.ok) return null;
+    const profiles = await profResp.json();
+    if (!Array.isArray(profiles) || profiles.length === 0) return null;
+
+    const profile = profiles[0];
+
+    // 2. Query public.medical_records table by user_id
+    let records = [];
+    try {
+      const recResp = await fetch(`${supabaseUrl}/rest/v1/medical_records?user_id=eq.${profile.id}&select=*&order=created_at.desc`, {
+        headers: {
+          "apikey": supabaseKey,
+          "Authorization": `Bearer ${supabaseKey}`
+        }
+      });
+      if (recResp.ok) {
+        records = await recResp.json();
+      }
+    } catch (_) {}
+
+    return {
+      success: true,
+      patient_no: pNum,
+      user: {
+        id: profile.id,
+        name: profile.full_name,
+        phone: profile.phone_number,
+        email: profile.email,
+        patient_no: profile.patient_no
+      },
+      records: records
+    };
+  } catch (err) {
+    console.warn("Supabase lookup by patient_no error:", err);
+    return null;
+  }
+}
+
+function getSystemPrompt(user = null, records = [], qdrantMatches = []) {
   const now = new Date();
   const currentDateStr = now.toLocaleDateString("en-US", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   const currentTimeStr = now.toLocaleTimeString("en-US", { hour: '2-digit', minute: '2-digit' });
 
   let userContext = "";
-  if (user && (user.name || user.phone || user.email)) {
-    userContext = `\nAUTHENTICATED PATIENT PROFILE:
+  if (user && (user.name || user.phone || user.email || user.patient_no)) {
+    userContext = `\nAUTHENTICATED PATIENT PROFILE (SUPABASE):
 - Full Name: ${user.name || "Patient"}
+- 2-Digit Patient Number: #${user.patient_no || "Not assigned"}
 - Phone Number: ${user.phone || "Not provided"}
 - Email: ${user.email || "Not provided"}
-Note: This patient is LOGGED IN. You already have their name (${user.name || "Patient"}) and phone number (${user.phone || "Not provided"}). Do NOT ask them to repeat their name or phone number unless they ask to use a different contact. Automatically use these saved details when calling the 'book_appointment' tool.\n`;
+Note: This patient is identified. You already have their name (${user.name || "Patient"}), Patient Number (#${user.patient_no || "N/A"}), and phone number (${user.phone || "Not provided"}). Do NOT ask them to repeat their name or phone number unless they ask to use a different contact. Automatically use these saved details when calling the 'book_appointment' tool.\n`;
   }
 
   let recordsContext = "";
@@ -33,17 +91,30 @@ Note: This patient is LOGGED IN. You already have their name (${user.name || "Pa
 - Extracted OCR Text Content: ${rec.ocr_text ? rec.ocr_text.slice(0, 800) : "No OCR text extracted"}
 `;
     });
-    recordsContext += `\nINSTRUCTION FOR PRESCRIPTION & LAB REPORT QUERIES:
-When the patient asks about their prescriptions, medications, lab test reports, or uploaded documents, use the information above to give precise, helpful, and caring answers. Always reassure them politely.\n`;
+  }
+
+  let qdrantRagContext = "";
+  if (Array.isArray(qdrantMatches) && qdrantMatches.length > 0) {
+    qdrantRagContext = `\nQDRANT VECTOR DATABASE SEMANTIC SEARCH RESULTS (Vector Similarity RAG):\n`;
+    qdrantMatches.forEach((hit, idx) => {
+      const rec = hit.record || {};
+      qdrantRagContext += `[Qdrant Match ${idx + 1} | Vector Similarity Score: ${hit.score}%]
+- Title: ${rec.title || "Document"}
+- Category: ${rec.category || "Medical Record"}
+- Notes: ${rec.doctor_notes || "None"}
+- OCR Transcribed Content: ${rec.ocr_text ? rec.ocr_text.slice(0, 600) : "N/A"}
+`;
+    });
+    qdrantRagContext += `\nINSTRUCTION: Use the Qdrant vector semantic search matches above to answer the patient's questions about their medical history, medications, or test results warmly and accurately.\n`;
   }
 
   return `You are Priya, a warm, caring, respectful, and professional Senior Care Coordinator at Apex Healthcare Clinic in Gurugram, India.
-Today's Clinic Date & Time: ${currentDateStr}, ${currentTimeStr}.${userContext}${recordsContext}
+Today's Clinic Date & Time: ${currentDateStr}, ${currentTimeStr}.${userContext}${recordsContext}${qdrantRagContext}
 
 APPOINTMENT BOOKING WORKFLOW:
 When a patient expresses interest in booking an appointment, check if you have all required booking details:
-1. Patient's Full Name (Auto-filled if logged in)
-2. Contact Mobile / Phone Number (Auto-filled if logged in)
+1. Patient's Full Name (Auto-filled if logged in or identified by Patient Number)
+2. Contact Mobile / Phone Number (Auto-filled if logged in or identified by Patient Number)
 3. Specialty or Doctor required (e.g. Dr. Rajesh Sharma for General Medicine, Dr. Ananya Deshmukh for Cardiology, Dr. Sunita Rao for Dermatology, Dr. Amit Patel for Pediatrics, Dr. Vikram Malhotra for Orthopedics, Dr. Rohan Verma for Neurology, Dr. Meera Nambiar for Gastroenterology, Dr. Sanjay Gupta for ENT)
 4. Preferred Date and Time
 
@@ -92,6 +163,20 @@ const TOOLS = [
         required: ["patient_name", "phone_number", "doctor_or_specialty", "date_time"]
       }
     }
+  },
+  {
+    type: "function",
+    function: {
+      name: "lookup_patient_by_number",
+      description: "Looks up a patient profile and past medical records from Supabase using their 2-digit Patient Number (e.g. 14, 42, 87). Use this when a phone caller or chat user mentions their patient number.",
+      parameters: {
+        type: "object",
+        properties: {
+          patient_no: { type: "number", description: "The 1 or 2-digit patient number (e.g. 14)" }
+        },
+        required: ["patient_no"]
+      }
+    }
   }
 ];
 
@@ -109,8 +194,8 @@ export default async function handler(req, res) {
 
   const userMessage = body.message || "";
   const history = Array.isArray(body.history) ? body.history : [];
-  const user = body.user && typeof body.user === "object" ? body.user : null;
-  const records = Array.isArray(body.records) ? body.records : [];
+  let user = body.user && typeof body.user === "object" ? body.user : null;
+  let records = Array.isArray(body.records) ? body.records : [];
 
   if (!userMessage.trim()) {
     return res.status(400).json({ error: "Message is required" });
@@ -125,8 +210,36 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Auto-detect 2-digit patient number in spoken / typed input (e.g., "my patient number is 14" or "patient 42")
+    const patNoMatch = userMessage.match(/\bpatient\s*(?:no\.?|number|\#)?\s*(\d{1,2})\b/i);
+    if (patNoMatch && patNoMatch[1]) {
+      const queriedData = await lookupPatientByNumber(patNoMatch[1]);
+      if (queriedData && queriedData.user) {
+        if (!user) user = queriedData.user;
+        else if (!user.patient_no) user.patient_no = queriedData.user.patient_no;
+        if (Array.isArray(queriedData.records) && queriedData.records.length > 0) {
+          records = [...records, ...queriedData.records];
+        }
+      }
+    }
+
+    // 1. Index any patient records passed in request into Qdrant Vector DB
+    if (Array.isArray(records) && records.length > 0) {
+      for (const rec of records) {
+        await indexRecordInQdrant(rec);
+      }
+    }
+
+    // 2. Perform Qdrant Vector Similarity RAG Search for user message
+    let qdrantMatches = [];
+    try {
+      qdrantMatches = await searchQdrantRecords(userMessage, user ? (user.id || user.phone || null) : null, 3);
+    } catch (qErr) {
+      console.warn("Qdrant RAG search error in chat handler:", qErr.message);
+    }
+
     const messages = [
-      { role: "system", content: getSystemPrompt(user, records) },
+      { role: "system", content: getSystemPrompt(user, records, qdrantMatches) },
       ...history.map(h => ({ role: h.role === "user" ? "user" : "assistant", content: h.content })),
       { role: "user", content: userMessage }
     ];
@@ -138,7 +251,7 @@ export default async function handler(req, res) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
+        model: "openai/gpt-oss-120b",
         messages: messages,
         tools: TOOLS,
         tool_choice: "auto",
@@ -156,9 +269,46 @@ export default async function handler(req, res) {
     const data = await groqResponse.json();
     const choiceMessage = data.choices?.[0]?.message;
 
-    // Check if the LLM invoked tool call 'book_appointment'
+    // Check if the LLM invoked tool calls
     if (choiceMessage?.tool_calls && choiceMessage.tool_calls.length > 0) {
       const toolCall = choiceMessage.tool_calls[0];
+
+      if (toolCall.function?.name === "lookup_patient_by_number") {
+        let args = {};
+        try { args = JSON.parse(toolCall.function.arguments || "{}"); } catch (_) {}
+
+        console.log("[Groq Chat] Executing tool call lookup_patient_by_number with args:", args);
+        const lookupResult = await lookupPatientByNumber(args.patient_no);
+
+        messages.push(choiceMessage);
+        messages.push({
+          role: "tool",
+          tool_call_id: toolCall.id,
+          name: "lookup_patient_by_number",
+          content: JSON.stringify(lookupResult || { error: `No patient found with Patient Number ${args.patient_no} in Supabase` })
+        });
+
+        const followUpResponse = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${apiKey}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: "openai/gpt-oss-120b",
+            messages: messages,
+            temperature: 0.5,
+            max_tokens: 250
+          })
+        });
+
+        if (followUpResponse.ok) {
+          const followUpData = await followUpResponse.json();
+          const reply = followUpData.choices?.[0]?.message?.content || `I have located the account for Patient Number ${args.patient_no}. How can I assist with your record?`;
+          return res.status(200).json({ reply, patientData: lookupResult, model: "openai/gpt-oss-120b" });
+        }
+      }
+
       if (toolCall.function?.name === "book_appointment") {
         let args = {};
         try {
@@ -185,7 +335,7 @@ export default async function handler(req, res) {
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            model: "llama-3.3-70b-versatile",
+            model: "openai/gpt-oss-120b",
             messages: messages,
             temperature: 0.5,
             max_tokens: 250
@@ -195,13 +345,13 @@ export default async function handler(req, res) {
         if (followUpResponse.ok) {
           const followUpData = await followUpResponse.json();
           const reply = followUpData.choices?.[0]?.message?.content || `I have booked your appointment for ${args.patient_name || 'you'} with ${args.doctor_or_specialty || 'our specialist'} on ${args.date_time || 'the requested time'} and saved it to Google Calendar and Sheets.`;
-          return res.status(200).json({ reply, booking: bookingResult, model: "llama-3.3-70b-versatile" });
+          return res.status(200).json({ reply, booking: bookingResult, model: "openai/gpt-oss-120b" });
         }
       }
     }
 
     const reply = choiceMessage?.content || "Thank you for reaching out to Apex Medical Center. How else can I assist you?";
-    return res.status(200).json({ reply, model: "llama-3.3-70b-versatile" });
+    return res.status(200).json({ reply, model: "openai/gpt-oss-120b" });
 
   } catch (err) {
     console.error("Error in Groq chat endpoint:", err);
@@ -211,3 +361,4 @@ export default async function handler(req, res) {
     });
   }
 }
+

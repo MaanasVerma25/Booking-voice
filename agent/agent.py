@@ -97,6 +97,27 @@ class BoothAgent(Agent):
 
         return f"Successfully scheduled appointment for {patient_name} with {doctor_or_specialty} on {date_time}."
 
+    @llm.ai_callable(description="Looks up a patient profile and past medical records from Supabase using their 2-digit Patient Number (e.g. 14, 42).")
+    async def lookup_patient_by_number(self, patient_no: int) -> str:
+        """Call when a caller on a phone call mentions their 2-digit Patient Number."""
+        supabase_url = os.getenv("SUPABASE_URL", "").rstrip("/")
+        supabase_key = os.getenv("SUPABASE_ANON_KEY", "")
+        if not supabase_url or not supabase_key:
+            return f"Patient Number {patient_no} recorded, but Supabase credentials are missing."
+
+        try:
+            url = f"{supabase_url}/rest/v1/profiles?patient_no=eq.{patient_no}&select=*"
+            req = urllib.request.Request(url, headers={"apikey": supabase_key, "Authorization": f"Bearer {supabase_key}"})
+            with urllib.request.urlopen(req, timeout=5) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                if data and isinstance(data, list) and len(data) > 0:
+                    profile = data[0]
+                    return f"Found Supabase patient record: Name: {profile.get('full_name')}, Phone: {profile.get('phone_number')}, Patient No: #{profile.get('patient_no')}."
+        except Exception as e:
+            logger.warning("Supabase patient lookup exception: %s", e)
+
+        return f"No record found in Supabase for Patient Number #{patient_no}."
+
     async def tts_node(self, text, model_settings):
         async def hardened():
             full = ""
@@ -126,7 +147,7 @@ async def entrypoint(ctx: JobContext):
 
     session = AgentSession(
         stt=inference.STT(model="deepgram/nova-3", language="multi"),
-        llm=openai.LLM.with_groq(model="llama-3.3-70b-versatile"),
+        llm=openai.LLM.with_groq(model="openai/gpt-oss-120b"),
         tts=rime.TTS(
             model=tts_model,
             speaker=voice_id,

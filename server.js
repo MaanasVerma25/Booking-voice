@@ -7,6 +7,7 @@ import chatHandler from "./api/chat.js";
 import ttsHandler from "./api/tts.js";
 import bookAppointmentHandler from "./api/book-appointment.js";
 import ocrHandler from "./api/ocr.js";
+import vectorSearchHandler from "./api/vector-search.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -60,7 +61,7 @@ const server = http.createServer((req, res) => {
     }));
   }
 
-  if (url.pathname === "/api/token" || url.pathname === "/api/chat" || url.pathname === "/api/tts" || url.pathname === "/api/book-appointment" || url.pathname === "/api/ocr") {
+  if (url.pathname === "/api/token" || url.pathname === "/api/chat" || url.pathname === "/api/tts" || url.pathname === "/api/book-appointment" || url.pathname === "/api/ocr" || url.pathname === "/api/vector-search") {
     let body = "";
     req.on("data", chunk => { body += chunk; });
     req.on("end", () => {
@@ -86,6 +87,7 @@ const server = http.createServer((req, res) => {
       if (url.pathname === "/api/tts") activeHandler = ttsHandler;
       if (url.pathname === "/api/book-appointment") activeHandler = bookAppointmentHandler;
       if (url.pathname === "/api/ocr") activeHandler = ocrHandler;
+      if (url.pathname === "/api/vector-search") activeHandler = vectorSearchHandler;
 
       activeHandler(req, res).catch(err => {
         console.error("API handler error:", err);

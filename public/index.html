@@ -1480,6 +1480,24 @@
 
           <!-- Right Column: Document Library & Filters -->
           <div class="rx-library">
+            <!-- Qdrant Vector Semantic Search Bar -->
+            <div class="qdrant-search-card" style="background: var(--bg-white); border: 1px solid var(--border-light); border-radius: var(--radius-card); padding: 18px 20px; margin-bottom: 20px; box-shadow: var(--shadow-sm);">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                <span style="font-size: 0.8rem; font-weight: 700; color: var(--accent-blue); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                  Qdrant Vector AI Search
+                </span>
+                <span style="font-size: 0.74rem; background: rgba(0,102,204,0.08); color: var(--accent-blue); padding: 2px 8px; border-radius: 12px; font-weight: 600;">@qdrant/js-client-rest</span>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <input type="text" id="qdrantSearchInput" class="rx-input" placeholder="Search prescriptions with Qdrant Vector AI (e.g. 'fever medicine', 'blood report', 'x-ray')..." style="flex: 1;" />
+                <button type="button" id="qdrantSearchBtn" style="padding: 10px 18px; border: none; background: var(--accent-blue); color: #fff; font-weight: 600; font-size: 0.84rem; border-radius: var(--radius-pill); cursor: pointer; white-space: nowrap; font-family: var(--font-stack); transition: var(--transition);">
+                  Vector Search
+                </button>
+              </div>
+              <div id="qdrantResultsSummary" style="display: none; font-size: 0.78rem; color: var(--text-secondary); margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border-light);"></div>
+            </div>
+
             <div class="rx-library-header">
               <div class="rx-filter-tabs">
                 <button class="rx-tab active" data-filter="all">All Records</button>
@@ -1635,6 +1653,10 @@
       </div>
 
       <div class="profile-details-grid">
+        <div class="profile-detail-card" style="border: 1.5px solid var(--accent-blue); background: rgba(0,102,204,0.05); grid-column: span 2;">
+          <span class="detail-label" style="color: var(--accent-blue); font-weight: 700;">Patient No. (AI Voice & n8n Key)</span>
+          <span class="detail-value" id="profilePatientNo" style="font-size: 1.35rem; font-weight: 800; color: var(--accent-blue);">#--</span>
+        </div>
         <div class="profile-detail-card">
           <span class="detail-label">Mobile Number</span>
           <span class="detail-value" id="profilePhone">Not provided</span>
@@ -1908,7 +1930,8 @@
         reqPayload.user = {
           name: meta.full_name || meta.name || "",
           phone: meta.phone_number || currentUser.phone || "",
-          email: currentUser.email || ""
+          email: currentUser.email || "",
+          patient_no: meta.patient_no || currentUser.patient_no || ""
         };
         reqPayload.records = Array.isArray(patientRecords) ? patientRecords : [];
       }
@@ -2090,9 +2113,60 @@
   const profileBookBtn = document.getElementById("profileBookBtn");
   const profileSignOutBtn = document.getElementById("profileSignOutBtn");
 
+  // Ensure user has a 2-digit patient_no (10-99) stored in metadata and Supabase profiles table
+  function generate2DigitPatientNo() {
+    return Math.floor(Math.random() * 90) + 10;
+  }
+
+  async function ensureUserPatientNo(user) {
+    if (!user) return null;
+    let meta = user.user_metadata || {};
+    let pNo = meta.patient_no || user.patient_no;
+
+    if (!pNo && supabaseClient) {
+      try {
+        const { data: profData } = await supabaseClient
+          .from("profiles")
+          .select("patient_no")
+          .eq("id", user.id)
+          .single();
+        if (profData && profData.patient_no) {
+          pNo = profData.patient_no;
+        }
+      } catch (_) {}
+    }
+
+    if (!pNo) {
+      pNo = generate2DigitPatientNo();
+      if (supabaseClient) {
+        try {
+          await supabaseClient.auth.updateUser({
+            data: { ...meta, patient_no: pNo }
+          });
+          await supabaseClient.from("profiles").upsert({
+            id: user.id,
+            patient_no: pNo,
+            full_name: meta.full_name || meta.name || "Patient",
+            phone_number: meta.phone_number || user.phone || "",
+            email: user.email || "",
+            updated_at: new Date().toISOString()
+          });
+        } catch (err) {
+          console.warn("Saving patient_no to Supabase failed:", err);
+        }
+      }
+    }
+
+    if (!user.user_metadata) user.user_metadata = {};
+    user.user_metadata.patient_no = pNo;
+    user.patient_no = pNo;
+    return pNo;
+  }
+
   function openProfileModal() {
     if (!currentUser) return;
     const meta = currentUser.user_metadata || {};
+    const pNo = meta.patient_no || currentUser.patient_no || "--";
     const rawEmail = currentUser.email || "";
     const isSynthetic = rawEmail.endsWith("@apexclinic.com") || rawEmail.endsWith("@apexclinic.app");
     const cleanEmail = isSynthetic ? "" : rawEmail;
@@ -2105,6 +2179,9 @@
     document.getElementById("profilePhone").textContent = displayPhone;
     document.getElementById("profileEmail").textContent = cleanEmail || "Not provided";
     document.getElementById("profileId").textContent = currentUser.id ? currentUser.id.slice(0, 18) + "..." : "PAT-" + Date.now();
+
+    const patNoEl = document.getElementById("profilePatientNo");
+    if (patNoEl) patNoEl.textContent = "#" + pNo;
 
     let createdStr = "Active";
     if (currentUser.created_at) {
@@ -2156,16 +2233,17 @@
     return name.trim().split(/\s+/).map(w => w[0]).join("").toUpperCase().slice(0, 2);
   }
 
-  function updateAuthUI(user) {
+  async function updateAuthUI(user) {
     currentUser = user;
     if (user) {
+      const pNo = await ensureUserPatientNo(user);
       const meta = user.user_metadata || {};
       const rawEmail = user.email || "";
       const isSynthetic = rawEmail.endsWith("@apexclinic.com") || rawEmail.endsWith("@apexclinic.app");
       const cleanEmail = isSynthetic ? "" : rawEmail;
 
       const displayName = meta.full_name || meta.name || cleanEmail || meta.phone_number || user.phone || "Patient";
-      const displaySub = meta.phone_number || user.phone || cleanEmail || "";
+      const displaySub = (meta.phone_number || user.phone || cleanEmail || "") + (pNo ? ` • Patient #${pNo}` : "");
 
       headerSignInBtn.style.display = "none";
       userBadge.classList.add("visible");
@@ -2242,6 +2320,7 @@
           return;
         }
 
+        const initialPatientNo = generate2DigitPatientNo();
         let { data, error } = await supabaseClient.auth.signUp({
           email: targetEmail,
           password: password,
@@ -2249,7 +2328,8 @@
             data: {
               full_name: nameInput,
               phone_number: targetPhone || credentialInput,
-              name: nameInput
+              name: nameInput,
+              patient_no: initialPatientNo
             }
           }
         });
@@ -2490,6 +2570,132 @@
     } catch (_) {}
 
     renderPatientRecords();
+
+    // Auto-index records into Qdrant vector database
+    if (patientRecords.length > 0) {
+      try {
+        fetch("/api/vector-search", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "index_bulk", records: patientRecords })
+        }).catch(() => {});
+      } catch (_) {}
+    }
+  }
+
+  // ─── Qdrant Vector Semantic Search JS Handler ───
+  const qdrantSearchInput = document.getElementById("qdrantSearchInput");
+  const qdrantSearchBtn = document.getElementById("qdrantSearchBtn");
+  const qdrantResultsSummary = document.getElementById("qdrantResultsSummary");
+
+  if (qdrantSearchBtn) {
+    qdrantSearchBtn.addEventListener("click", runQdrantVectorSearch);
+  }
+  if (qdrantSearchInput) {
+    qdrantSearchInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        runQdrantVectorSearch();
+      }
+    });
+  }
+
+  async function runQdrantVectorSearch() {
+    if (!qdrantSearchInput) return;
+    const query = qdrantSearchInput.value.trim();
+    if (!query) {
+      loadPatientRecords();
+      if (qdrantResultsSummary) qdrantResultsSummary.style.display = "none";
+      return;
+    }
+
+    qdrantSearchBtn.disabled = true;
+    qdrantSearchBtn.textContent = "Searching...";
+
+    try {
+      const resp = await fetch("/api/vector-search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          query: query,
+          userId: currentUser ? currentUser.id : null,
+          records: patientRecords
+        })
+      });
+
+      const data = await resp.json();
+      if (data && data.success && Array.isArray(data.results)) {
+        renderQdrantSearchResults(data.results, query);
+      } else {
+        alert("No vector similarity matches found for query.");
+      }
+    } catch (err) {
+      console.error("Qdrant vector search failed:", err);
+    } finally {
+      qdrantSearchBtn.disabled = false;
+      qdrantSearchBtn.textContent = "Vector Search";
+    }
+  }
+
+  function renderQdrantSearchResults(results, query) {
+    if (!rxRecordsGrid) return;
+    rxRecordsGrid.innerHTML = "";
+
+    if (qdrantResultsSummary) {
+      qdrantResultsSummary.style.display = "block";
+      qdrantResultsSummary.innerHTML = `<strong>Qdrant Vector AI:</strong> Found <strong>${results.length}</strong> vector similarity matches for <em>"${escapeHtml(query)}"</em>.`;
+    }
+
+    if (results.length === 0) {
+      if (rxEmptyState) rxEmptyState.style.display = "block";
+      return;
+    }
+
+    if (rxEmptyState) rxEmptyState.style.display = "none";
+
+    results.forEach(hit => {
+      const rec = hit.record || {};
+      const card = document.createElement("div");
+      card.className = "rx-record-card";
+      card.style.border = "1px solid var(--accent-blue)";
+
+      let catClass = "other";
+      let catLower = (rec.category || "").toLowerCase();
+      if (catLower.includes("prescription")) catClass = "prescription";
+      else if (catLower.includes("lab")) catClass = "lab-report";
+      else if (catLower.includes("scan") || catLower.includes("imaging")) catClass = "scan";
+
+      const createdDate = rec.created_at ? new Date(rec.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "Recent";
+      const scorePill = `<span style="background: rgba(0,102,204,0.12); color: var(--accent-blue); font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 10px;">Qdrant Match: ${hit.score}%</span>`;
+
+      card.innerHTML = `
+        <div class="rx-card-top">
+          <span class="rx-badge ${catClass}">${escapeHtml(rec.category || "Document")}</span>
+          ${scorePill}
+        </div>
+        <div class="rx-card-info" style="margin-top: 6px;">
+          <h4>${escapeHtml(rec.title || rec.file_name || "Medical Document")}</h4>
+          ${rec.doctor_notes ? `<p>${escapeHtml(rec.doctor_notes)}</p>` : ""}
+          ${rec.ocr_text ? `<p style="font-size: 0.76rem; color: var(--text-tertiary); margin-top: 4px; font-style: italic;">"${escapeHtml(rec.ocr_text.slice(0, 100))}..."</p>` : ""}
+          <div class="rx-card-meta">
+            <span>📅 ${createdDate}</span>
+          </div>
+        </div>
+        <div class="rx-card-actions">
+          <button class="rx-btn rx-preview-btn" data-id="${rec.id || rec.record_id}">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            Preview
+          </button>
+          <a href="${rec.file_url}" target="_blank" download="${escapeHtml(rec.file_name || 'record')}" class="rx-btn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download
+          </a>
+        </div>
+      `;
+
+      card.querySelector(".rx-preview-btn").addEventListener("click", () => previewDocument(rec));
+      rxRecordsGrid.appendChild(card);
+    });
   }
 
   function saveLocalPatientRecords() {

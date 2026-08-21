@@ -9,6 +9,7 @@
     "vercel-dev": "vercel dev"
   },
   "dependencies": {
+    "@qdrant/js-client-rest": "^1.19.0",
     "livekit-server-sdk": "^2.9.0"
   }
 }

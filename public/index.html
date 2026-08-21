@@ -1159,7 +1159,7 @@
             <div class="feature-icon">
               <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
             </div>
-            <span>Powered by Groq LLM Indian Voice AI</span>
+            <span>Powered by Advanced Indian Voice AI</span>
           </div>
         </div>
       </div>
@@ -1473,24 +1473,24 @@
               </div>
 
               <button type="submit" class="rx-submit-btn" id="rxSubmitBtn">
-                Upload & Store in Supabase
+                Upload & Store Securely
               </button>
             </form>
           </div>
 
           <!-- Right Column: Document Library & Filters -->
           <div class="rx-library">
-            <!-- Qdrant Vector Semantic Search Bar -->
+            <!-- AI Vector Semantic Search Bar -->
             <div class="qdrant-search-card" style="background: var(--bg-white); border: 1px solid var(--border-light); border-radius: var(--radius-card); padding: 18px 20px; margin-bottom: 20px; box-shadow: var(--shadow-sm);">
               <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
                 <span style="font-size: 0.8rem; font-weight: 700; color: var(--accent-blue); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px;">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                  Qdrant Vector AI Search
+                  AI Vector Search
                 </span>
-                <span style="font-size: 0.74rem; background: rgba(0,102,204,0.08); color: var(--accent-blue); padding: 2px 8px; border-radius: 12px; font-weight: 600;">@qdrant/js-client-rest</span>
+                <span style="font-size: 0.74rem; background: rgba(0,102,204,0.08); color: var(--accent-blue); padding: 2px 8px; border-radius: 12px; font-weight: 600;">Smart Semantic Search</span>
               </div>
               <div style="display: flex; gap: 8px;">
-                <input type="text" id="qdrantSearchInput" class="rx-input" placeholder="Search prescriptions with Qdrant Vector AI (e.g. 'fever medicine', 'blood report', 'x-ray')..." style="flex: 1;" />
+                <input type="text" id="qdrantSearchInput" class="rx-input" placeholder="Search prescriptions with AI Vector Search (e.g. 'fever medicine', 'blood report', 'x-ray')..." style="flex: 1;" />
                 <button type="button" id="qdrantSearchBtn" style="padding: 10px 18px; border: none; background: var(--accent-blue); color: #fff; font-weight: 600; font-size: 0.84rem; border-radius: var(--radius-pill); cursor: pointer; white-space: nowrap; font-family: var(--font-stack); transition: var(--transition);">
                   Vector Search
                 </button>
@@ -1654,7 +1654,7 @@
 
       <div class="profile-details-grid">
         <div class="profile-detail-card" style="border: 1.5px solid var(--accent-blue); background: rgba(0,102,204,0.05); grid-column: span 2;">
-          <span class="detail-label" style="color: var(--accent-blue); font-weight: 700;">Patient No. (AI Voice & n8n Key)</span>
+          <span class="detail-label" style="color: var(--accent-blue); font-weight: 700;">Patient No. (AI Voice & Reference Key)</span>
           <span class="detail-value" id="profilePatientNo" style="font-size: 1.35rem; font-weight: 800; color: var(--accent-blue);">#--</span>
         </div>
         <div class="profile-detail-card">
@@ -1804,7 +1804,7 @@
         if ('speechSynthesis' in window) window.speechSynthesis.cancel();
       }
     };
-    setStatus("Connected (Groq LLM Active) • Priya is ready");
+    setStatus("Connected • Priya is ready");
     const greeting = MOCK_REPLIES[0];
     setTimeout(() => {
       addBubble("agent", greeting);
@@ -1921,7 +1921,7 @@
     textInput.value = "";
     chatHistory.push({ role: "user", content: text });
 
-    setStatus("Priya is thinking (Groq LLM)...");
+    setStatus("Priya is thinking...");
 
     try {
       const reqPayload = { message: text, history: chatHistory.slice(-6) };
@@ -2379,9 +2379,9 @@
       let friendlyMsg = "Authentication failed. Please try again.";
 
       if (code === "over_email_send_rate_limit" || msg.includes("email rate limit") || msg.includes("rate limit")) {
-        friendlyMsg = "Too many attempts. Please wait a few minutes before trying again, or go to Supabase Dashboard → Authentication → Email → and disable 'Confirm email'.";
+        friendlyMsg = "Too many attempts. Please wait a few minutes before trying again, or contact clinic support.";
       } else if (code === "email_not_confirmed" || msg.includes("Email not confirmed")) {
-        friendlyMsg = "Account registered! Please check your inbox to confirm your email, or ask your admin to disable email confirmation in Supabase dashboard.";
+        friendlyMsg = "Account registered! Please check your inbox to confirm your email, or contact clinic support.";
       } else if (code === "invalid_credentials" || msg.includes("Invalid login credentials")) {
         friendlyMsg = "Incorrect mobile number or password. Please try again.";
       } else if (code === "user_already_exists" || msg.includes("User already registered")) {
@@ -2643,7 +2643,7 @@
 
     if (qdrantResultsSummary) {
       qdrantResultsSummary.style.display = "block";
-      qdrantResultsSummary.innerHTML = `<strong>Qdrant Vector AI:</strong> Found <strong>${results.length}</strong> vector similarity matches for <em>"${escapeHtml(query)}"</em>.`;
+      qdrantResultsSummary.innerHTML = `<strong>AI Vector Search:</strong> Found <strong>${results.length}</strong> semantic matches for <em>"${escapeHtml(query)}"</em>.`;
     }
 
     if (results.length === 0) {
@@ -2666,7 +2666,7 @@
       else if (catLower.includes("scan") || catLower.includes("imaging")) catClass = "scan";
 
       const createdDate = rec.created_at ? new Date(rec.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "Recent";
-      const scorePill = `<span style="background: rgba(0,102,204,0.12); color: var(--accent-blue); font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 10px;">Qdrant Match: ${hit.score}%</span>`;
+      const scorePill = `<span style="background: rgba(0,102,204,0.12); color: var(--accent-blue); font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 10px;">AI Match: ${hit.score}%</span>`;
 
       card.innerHTML = `
         <div class="rx-card-top">
@@ -2798,7 +2798,7 @@
       }
 
       rxSubmitBtn.disabled = true;
-      rxSubmitBtn.textContent = "Running OCR & Uploading to Supabase...";
+      rxSubmitBtn.textContent = "Processing OCR & Uploading...";
 
       try {
         let fileUrl = "";
@@ -2814,7 +2814,7 @@
 
         fileUrl = base64Url;
 
-        // Run OCR.space Text Extraction
+        // Run OCR Text Extraction
         try {
           const ocrResp = await fetch("/api/ocr", {
             method: "POST",
@@ -2829,7 +2829,7 @@
           console.warn("OCR API call error:", ocrErr);
         }
 
-        // 1. Try Supabase Storage Upload
+        // 1. Try Storage Upload
         if (supabaseClient) {
           try {
             const path = currentUser.id + "/" + Date.now() + "_" + selectedRxFile.name.replace(/[^a-zA-Z0-9._-]/g, "_");
@@ -2845,7 +2845,7 @@
               }
             }
           } catch (err) {
-            console.warn("Supabase storage upload skipped:", err);
+            console.warn("Storage upload skipped:", err);
           }
         }
 
@@ -2864,7 +2864,7 @@
           created_at: new Date().toISOString()
         };
 
-        // 2. Insert into Supabase Database
+        // 2. Insert into Database
         if (supabaseClient) {
           try {
             const { data: dbData, error: dbErr } = await supabaseClient
@@ -2887,7 +2887,7 @@
               newRecord.id = dbData[0].id;
             }
           } catch (err) {
-            console.warn("Supabase table insert skipped:", err);
+            console.warn("Table insert skipped:", err);
           }
         }
 
@@ -2898,14 +2898,14 @@
         // Reset form
         rxUploadForm.reset();
         setSelectedRxFile(null);
-        alert("Success! Your medical record has been converted to text via OCR and stored securely in Supabase.");
+        alert("Success! Your medical record has been converted to text via OCR and stored securely.");
 
       } catch (err) {
         console.error("Error uploading medical record:", err);
         alert("Failed to upload document. Please try again.");
       } finally {
         rxSubmitBtn.disabled = false;
-        rxSubmitBtn.textContent = "Upload & Store in Supabase";
+        rxSubmitBtn.textContent = "Upload & Store Securely";
       }
     });
   }

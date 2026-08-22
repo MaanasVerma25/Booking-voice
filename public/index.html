@@ -359,16 +359,25 @@
     border-radius: var(--radius-card);
     padding: 30px;
     box-shadow: var(--shadow-sm);
-    transition: var(--transition);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    cursor: pointer;
+    position: relative;
+    user-select: none;
   }
 
   .doctor-card:hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow-lg);
-    border-color: rgba(0, 102, 204, 0.25);
+    border-color: rgba(0, 102, 204, 0.3);
+  }
+
+  .doctor-card.expanded {
+    border-color: var(--accent-blue);
+    box-shadow: 0 12px 32px rgba(0, 102, 204, 0.12);
+    background: #fafbfc;
   }
 
   .doc-badge {
@@ -384,14 +393,14 @@
   .doc-name { font-size: 1.25rem; font-weight: 600; margin-bottom: 4px; color: var(--text-primary); }
   .doc-price { font-size: 1.05rem; font-weight: 600; color: var(--text-primary); margin-bottom: 14px; }
   .doc-price span { font-size: 0.85rem; color: var(--text-secondary); font-weight: 400; }
-  .doc-desc { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.45; margin-bottom: 24px; }
+  .doc-desc { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.45; margin-bottom: 16px; }
 
   .doc-btn {
     width: 100%;
     background: var(--bg-alt);
     color: var(--accent-blue);
     border: 1px solid var(--border-light);
-    padding: 10px;
+    padding: 10px 16px;
     border-radius: var(--radius-pill);
     font-size: 0.88rem;
     font-weight: 500;
@@ -400,13 +409,95 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 8px;
+    margin-top: 14px;
   }
 
-  .doc-btn:hover {
+  .doc-btn:hover, .doctor-card.expanded .doc-btn {
     background: var(--accent-blue);
     color: #ffffff;
     border-color: var(--accent-blue);
+  }
+
+  .arrow-icon {
+    display: inline-block;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    font-size: 0.85rem;
+  }
+
+  .doctor-card.expanded .arrow-icon {
+    transform: rotate(180deg);
+  }
+
+  /* Expandable Doctor Details Box */
+  .doc-details-expand {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease, margin-top 0.3s ease;
+    margin-top: 0;
+  }
+
+  .doctor-card.expanded .doc-details-expand {
+    max-height: 400px;
+    opacity: 1;
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px dashed var(--border-card);
+  }
+
+  .doc-detail-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 0.83rem;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    line-height: 1.4;
+  }
+
+  .doc-detail-row strong {
+    color: var(--text-primary);
+    font-weight: 600;
+    min-width: 95px;
+    display: inline-block;
+  }
+
+  .doc-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+    margin-bottom: 12px;
+  }
+
+  .doc-tag {
+    font-size: 0.73rem;
+    background: var(--accent-blue-soft);
+    color: var(--accent-blue);
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-weight: 500;
+  }
+
+  .doc-book-voice-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--accent-blue);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 4px 0;
+    margin-top: 6px;
+    transition: var(--transition);
+  }
+
+  .doc-book-voice-link:hover {
+    color: var(--accent-blue-hover);
+    text-decoration: underline;
   }
 
   /* Standard Light Section: Diagnostics & Services */
@@ -1109,9 +1200,6 @@
   <section class="hero-section">
     <div class="hero-container">
       <div>
-        <div class="status-pill">
-          <span class="status-dot"></span> 24/7 AI Voice Care Assistant Active
-        </div>
         <h1>Healthcare.<br>Spoken clearly.</h1>
         <p class="subhead" style="margin-top: 18px;">Experience instant doctor appointments, specialist inquiries, and diagnostic lab pricing through intuitive voice interaction with Priya.</p>
         
@@ -1183,9 +1271,33 @@
             <h3 class="doc-name">Dr. Rajesh Sharma</h3>
             <div class="doc-price">₹500 <span>/ Consultation</span></div>
             <p class="doc-desc">Routine checkups, fever treatment, diabetes, and hypertension care.</p>
+            
+            <div class="doc-details-expand">
+              <div class="doc-detail-row">
+                <strong>Qualifications:</strong>
+                <span>MBBS, MD (Internal Med, AIIMS) — 14+ Yrs Experience</span>
+              </div>
+              <div class="doc-detail-row">
+                <strong>Availability:</strong>
+                <span>Mon – Sat | 9:00 AM – 2:00 PM</span>
+              </div>
+              <div class="doc-detail-row">
+                <strong>Languages:</strong>
+                <span>English, Hindi, Punjabi</span>
+              </div>
+              <div class="doc-tags">
+                <span class="doc-tag">Diabetes Care</span>
+                <span class="doc-tag">Hypertension</span>
+                <span class="doc-tag">Preventive Health</span>
+              </div>
+              <button class="doc-book-voice-link" data-doc="Dr. Rajesh Sharma (General Medicine)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+                Book with Priya Voice Assistant →
+              </button>
+            </div>
           </div>
-          <button class="doc-btn book-doc-btn" data-doc="Dr. Rajesh Sharma (General Medicine)">
-            Schedule via Voice <span>→</span>
+          <button class="doc-btn">
+            <span class="btn-label">More Details</span> <span class="arrow-icon">↓</span>
           </button>
         </div>
 
@@ -1196,9 +1308,33 @@
             <h3 class="doc-name">Dr. Ananya Deshmukh</h3>
             <div class="doc-price">₹1,200 <span>/ Consultation</span></div>
             <p class="doc-desc">ECG evaluations, heart disease screenings, echo testing, and BP management.</p>
+            
+            <div class="doc-details-expand">
+              <div class="doc-detail-row">
+                <strong>Qualifications:</strong>
+                <span>MBBS, DM (Cardiology, Fortis) — 16+ Yrs Experience</span>
+              </div>
+              <div class="doc-detail-row">
+                <strong>Availability:</strong>
+                <span>Mon – Fri | 10:00 AM – 4:00 PM</span>
+              </div>
+              <div class="doc-detail-row">
+                <strong>Languages:</strong>
+                <span>English, Hindi, Marathi</span>
+              </div>
+              <div class="doc-tags">
+                <span class="doc-tag">ECG & Echo</span>
+                <span class="doc-tag">Heart Disease</span>
+                <span class="doc-tag">BP Control</span>
+              </div>
+              <button class="doc-book-voice-link" data-doc="Dr. Ananya Deshmukh (Cardiology)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+                Book with Priya Voice Assistant →
+              </button>
+            </div>
           </div>
-          <button class="doc-btn book-doc-btn" data-doc="Dr. Ananya Deshmukh (Cardiology)">
-            Schedule via Voice <span>→</span>
+          <button class="doc-btn">
+            <span class="btn-label">More Details</span> <span class="arrow-icon">↓</span>
           </button>
         </div>
 
@@ -1209,9 +1345,33 @@
             <h3 class="doc-name">Dr. Amit Patel</h3>
             <div class="doc-price">₹700 <span>/ Consultation</span></div>
             <p class="doc-desc">Child vaccinations, growth monitoring, and pediatric health care.</p>
+            
+            <div class="doc-details-expand">
+              <div class="doc-detail-row">
+                <strong>Qualifications:</strong>
+                <span>MBBS, DCH, MD (Pediatrics) — 10+ Yrs Experience</span>
+              </div>
+              <div class="doc-detail-row">
+                <strong>Availability:</strong>
+                <span>Mon – Sat | 10:00 AM – 5:00 PM</span>
+              </div>
+              <div class="doc-detail-row">
+                <strong>Languages:</strong>
+                <span>English, Hindi, Gujarati</span>
+              </div>
+              <div class="doc-tags">
+                <span class="doc-tag">Vaccinations</span>
+                <span class="doc-tag">Growth Tracking</span>
+                <span class="doc-tag">Infant Care</span>
+              </div>
+              <button class="doc-book-voice-link" data-doc="Dr. Amit Patel (Pediatrics)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+                Book with Priya Voice Assistant →
+              </button>
+            </div>
           </div>
-          <button class="doc-btn book-doc-btn" data-doc="Dr. Amit Patel (Pediatrics)">
-            Schedule via Voice <span>→</span>
+          <button class="doc-btn">
+            <span class="btn-label">More Details</span> <span class="arrow-icon">↓</span>
           </button>
         </div>
 
@@ -1222,9 +1382,33 @@
             <h3 class="doc-name">Dr. Sunita Rao</h3>
             <div class="doc-price">₹900 <span>/ Consultation</span></div>
             <p class="doc-desc">Acne treatments, eczema, hair loss consultation, and mole evaluation.</p>
+            
+            <div class="doc-details-expand">
+              <div class="doc-detail-row">
+                <strong>Qualifications:</strong>
+                <span>MBBS, MD (Dermatology) — 12+ Yrs Experience</span>
+              </div>
+              <div class="doc-detail-row">
+                <strong>Availability:</strong>
+                <span>Tue – Sun | 11:00 AM – 6:00 PM</span>
+              </div>
+              <div class="doc-detail-row">
+                <strong>Languages:</strong>
+                <span>English, Hindi, Kannada</span>
+              </div>
+              <div class="doc-tags">
+                <span class="doc-tag">Acne & Eczema</span>
+                <span class="doc-tag">Hair Loss</span>
+                <span class="doc-tag">Skin Care</span>
+              </div>
+              <button class="doc-book-voice-link" data-doc="Dr. Sunita Rao (Dermatology)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+                Book with Priya Voice Assistant →
+              </button>
+            </div>
           </div>
-          <button class="doc-btn book-doc-btn" data-doc="Dr. Sunita Rao (Dermatology)">
-            Schedule via Voice <span>→</span>
+          <button class="doc-btn">
+            <span class="btn-label">More Details</span> <span class="arrow-icon">↓</span>
           </button>
         </div>
 
@@ -1235,9 +1419,33 @@
             <h3 class="doc-name">Dr. Vikram Malhotra</h3>
             <div class="doc-price">₹1,000 <span>/ Consultation</span></div>
             <p class="doc-desc">Joint pain, arthritis, fracture management, and physical therapy referrals.</p>
+            
+            <div class="doc-details-expand">
+              <div class="doc-detail-row">
+                <strong>Qualifications:</strong>
+                <span>MBBS, MS (Ortho), MCh Ortho (UK) — 18+ Yrs Exp</span>
+              </div>
+              <div class="doc-detail-row">
+                <strong>Availability:</strong>
+                <span>Mon – Sat | 11:00 AM – 4:00 PM</span>
+              </div>
+              <div class="doc-detail-row">
+                <strong>Languages:</strong>
+                <span>English, Hindi, Punjabi</span>
+              </div>
+              <div class="doc-tags">
+                <span class="doc-tag">Joint Replacement</span>
+                <span class="doc-tag">Arthritis</span>
+                <span class="doc-tag">Sports Injuries</span>
+              </div>
+              <button class="doc-book-voice-link" data-doc="Dr. Vikram Malhotra (Orthopedics)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+                Book with Priya Voice Assistant →
+              </button>
+            </div>
           </div>
-          <button class="doc-btn book-doc-btn" data-doc="Dr. Vikram Malhotra (Orthopedics)">
-            Schedule via Voice <span>→</span>
+          <button class="doc-btn">
+            <span class="btn-label">More Details</span> <span class="arrow-icon">↓</span>
           </button>
         </div>
 
@@ -1248,9 +1456,33 @@
             <h3 class="doc-name">Dr. Rohan Verma</h3>
             <div class="doc-price">₹1,500 <span>/ Consultation</span></div>
             <p class="doc-desc">Migraine management, nerve assessments, epilepsy, and stroke rehabilitation.</p>
+            
+            <div class="doc-details-expand">
+              <div class="doc-detail-row">
+                <strong>Qualifications:</strong>
+                <span>MBBS, DM (Neurology, NIMHANS) — 15+ Yrs Exp</span>
+              </div>
+              <div class="doc-detail-row">
+                <strong>Availability:</strong>
+                <span>Mon, Wed, Fri | 12:00 PM – 5:00 PM</span>
+              </div>
+              <div class="doc-detail-row">
+                <strong>Languages:</strong>
+                <span>English, Hindi</span>
+              </div>
+              <div class="doc-tags">
+                <span class="doc-tag">Migraine Care</span>
+                <span class="doc-tag">Nerve Disorders</span>
+                <span class="doc-tag">Stroke Rehab</span>
+              </div>
+              <button class="doc-book-voice-link" data-doc="Dr. Rohan Verma (Neurology)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+                Book with Priya Voice Assistant →
+              </button>
+            </div>
           </div>
-          <button class="doc-btn book-doc-btn" data-doc="Dr. Rohan Verma (Neurology)">
-            Schedule via Voice <span>→</span>
+          <button class="doc-btn">
+            <span class="btn-label">More Details</span> <span class="arrow-icon">↓</span>
           </button>
         </div>
 
@@ -1261,9 +1493,33 @@
             <h3 class="doc-name">Dr. Meera Nambiar</h3>
             <div class="doc-price">₹1,100 <span>/ Consultation</span></div>
             <p class="doc-desc">Acid reflux, IBS care, digestive health, and endoscopy consultations.</p>
+            
+            <div class="doc-details-expand">
+              <div class="doc-detail-row">
+                <strong>Qualifications:</strong>
+                <span>MBBS, MD, DM (Gastroenterology) — 13+ Yrs Exp</span>
+              </div>
+              <div class="doc-detail-row">
+                <strong>Availability:</strong>
+                <span>Tue, Thu, Sat | 10:00 AM – 3:00 PM</span>
+              </div>
+              <div class="doc-detail-row">
+                <strong>Languages:</strong>
+                <span>English, Hindi, Malayalam</span>
+              </div>
+              <div class="doc-tags">
+                <span class="doc-tag">Acid Reflux & IBS</span>
+                <span class="doc-tag">Liver Care</span>
+                <span class="doc-tag">Endoscopy</span>
+              </div>
+              <button class="doc-book-voice-link" data-doc="Dr. Meera Nambiar (Gastroenterology)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+                Book with Priya Voice Assistant →
+              </button>
+            </div>
           </div>
-          <button class="doc-btn book-doc-btn" data-doc="Dr. Meera Nambiar (Gastroenterology)">
-            Schedule via Voice <span>→</span>
+          <button class="doc-btn">
+            <span class="btn-label">More Details</span> <span class="arrow-icon">↓</span>
           </button>
         </div>
 
@@ -1274,9 +1530,33 @@
             <h3 class="doc-name">Dr. Sanjay Gupta</h3>
             <div class="doc-price">₹800 <span>/ Consultation</span></div>
             <p class="doc-desc">Sinusitis, allergy testing, hearing evaluations, and throat care.</p>
+            
+            <div class="doc-details-expand">
+              <div class="doc-detail-row">
+                <strong>Qualifications:</strong>
+                <span>MBBS, MS (ENT / Otorhinolaryngology) — 11+ Yrs</span>
+              </div>
+              <div class="doc-detail-row">
+                <strong>Availability:</strong>
+                <span>Mon – Sat | 9:30 AM – 3:30 PM</span>
+              </div>
+              <div class="doc-detail-row">
+                <strong>Languages:</strong>
+                <span>English, Hindi</span>
+              </div>
+              <div class="doc-tags">
+                <span class="doc-tag">Sinus Care</span>
+                <span class="doc-tag">Allergy Testing</span>
+                <span class="doc-tag">Hearing Check</span>
+              </div>
+              <button class="doc-book-voice-link" data-doc="Dr. Sanjay Gupta (ENT & Allergy)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+                Book with Priya Voice Assistant →
+              </button>
+            </div>
           </div>
-          <button class="doc-btn book-doc-btn" data-doc="Dr. Sanjay Gupta (ENT & Allergy)">
-            Schedule via Voice <span>→</span>
+          <button class="doc-btn">
+            <span class="btn-label">More Details</span> <span class="arrow-icon">↓</span>
           </button>
         </div>
       </div>
@@ -1749,10 +2029,31 @@
   document.getElementById("heroCallBtn").addEventListener("click", () => openCallModal());
   document.getElementById("closeCallBtn").addEventListener("click", closeCallModal);
 
-  document.querySelectorAll(".book-doc-btn").forEach(btn => {
-    btn.addEventListener("click", (e) => {
-      const doc = e.target.getAttribute("data-doc");
-      openCallModal("I would like to book an appointment with " + doc);
+  document.querySelectorAll(".doctor-card").forEach(card => {
+    card.addEventListener("click", (e) => {
+      const voiceLink = e.target.closest(".doc-book-voice-link");
+      if (voiceLink) {
+        e.stopPropagation();
+        const doc = voiceLink.getAttribute("data-doc");
+        openCallModal("I would like to book an appointment with " + doc);
+        return;
+      }
+
+      const isCurrentlyExpanded = card.classList.contains("expanded");
+
+      document.querySelectorAll(".doctor-card.expanded").forEach(c => {
+        if (c !== card) {
+          c.classList.remove("expanded");
+          const lbl = c.querySelector(".btn-label");
+          if (lbl) lbl.textContent = "More Details";
+        }
+      });
+
+      card.classList.toggle("expanded", !isCurrentlyExpanded);
+      const btnLabel = card.querySelector(".btn-label");
+      if (btnLabel) {
+        btnLabel.textContent = !isCurrentlyExpanded ? "Hide Details" : "More Details";
+      }
     });
   });
 
